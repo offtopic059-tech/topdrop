@@ -28,14 +28,24 @@
     const { props, preview } = parseDataProps(
       scriptEl?.getAttribute("data-props") ?? null
     );
+    const tplEl = doc.getElementById("dc-template");
     return {
-      template: dc.innerHTML,
+      template: tplEl ? tplEl.textContent : dc.innerHTML,
       js: scriptEl ? scriptEl.textContent || "" : "",
       props,
       preview
     };
   }
   function parseDcText(src) {
+    if (src.indexOf('id="dc-template"') !== -1) {
+      const d0 = new DOMParser().parseFromString(src, "text/html");
+      const t0 = d0.getElementById("dc-template");
+      const s0 = d0.querySelector("script[data-dc-script]");
+      if (t0) {
+        const pp = parseDataProps(s0?.getAttribute("data-props") ?? null);
+        return { template: t0.textContent, js: s0 ? s0.textContent || "" : "", props: pp.props, preview: pp.preview };
+      }
+    }
     const openMatch = /<x-dc(?:\s[^>]*)?>/.exec(src);
     if (!openMatch) return null;
     const close = src.lastIndexOf("</x-dc>");

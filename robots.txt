@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://offtopic059-tech.github.io/topdrop/sitemap.xml
