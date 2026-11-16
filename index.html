@@ -130,8 +130,8 @@ button,input,select,textarea{font-family:inherit}
 .td-sortmenu{right:-8px!important}}
 .td-fbtn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 12px;border:1px solid #dcdad4;border-radius:999px;background:#ffffff;color:#16130f;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
 .td-fcount{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ffc400;color:#16130f;font-size:11px;line-height:18px;font-weight:800;text-align:center}
-.td-sheetbg{position:fixed;inset:0;z-index:60;touch-action:none;background:rgba(22,19,15,.45);animation:tdFade .25s ease both}
-.td-sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;overscroll-behavior:contain;max-height:86vh;max-height:86dvh;display:flex;flex-direction:column;background:#ffffff;border-radius:18px 18px 0 0;padding-top:14px;animation:tdSheet .32s cubic-bezier(.2,.8,.2,1) both}
+.td-sheetbg{position:fixed;inset:0;z-index:70;touch-action:none;background:#ffffff}
+.td-sheet{position:fixed;inset:0;z-index:71;height:100vh;height:100dvh;overscroll-behavior:contain;display:flex;flex-direction:column;background:#ffffff;padding-top:max(10px,env(safe-area-inset-top));animation:tdMm .28s ease-out both}
 .td-sheetbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 20px 24px;display:flex;flex-direction:column;gap:22px}
 .td-spill{height:40px;padding:0 16px;border:none;border-radius:999px;background:#f4f3f0;color:#484742;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
 .td-spill[data-on="true"]{background:#16130f;color:#ffffff;font-weight:600}
@@ -842,8 +842,8 @@ button,input,select,textarea{font-family:inherit}
 .td-sortmenu{right:-8px!important}}
 .td-fbtn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 12px;border:1px solid #dcdad4;border-radius:999px;background:#ffffff;color:#16130f;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
 .td-fcount{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ffc400;color:#16130f;font-size:11px;line-height:18px;font-weight:800;text-align:center}
-.td-sheetbg{position:fixed;inset:0;z-index:60;touch-action:none;background:rgba(22,19,15,.45);animation:tdFade .25s ease both}
-.td-sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;overscroll-behavior:contain;max-height:86vh;max-height:86dvh;display:flex;flex-direction:column;background:#ffffff;border-radius:18px 18px 0 0;padding-top:14px;animation:tdSheet .32s cubic-bezier(.2,.8,.2,1) both}
+.td-sheetbg{position:fixed;inset:0;z-index:70;touch-action:none;background:#ffffff}
+.td-sheet{position:fixed;inset:0;z-index:71;height:100vh;height:100dvh;overscroll-behavior:contain;display:flex;flex-direction:column;background:#ffffff;padding-top:max(10px,env(safe-area-inset-top));animation:tdMm .28s ease-out both}
 .td-sheetbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 20px 24px;display:flex;flex-direction:column;gap:22px}
 .td-spill{height:40px;padding:0 16px;border:none;border-radius:999px;background:#f4f3f0;color:#484742;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
 .td-spill[data-on="true"]{background:#16130f;color:#ffffff;font-weight:600}
@@ -948,7 +948,8 @@ button,input,select,textarea{font-family:inherit}
 </div>
 </sc-if>
 <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
-<nav aria-label="Mobilna navigacija" class="td-mmenu" style="position:fixed;left:0;right:0;top:{{ mTop }};bottom:0;background:#ffffff;padding:8px 24px 32px;display:flex;flex-direction:column;z-index:50">
+<nav aria-label="Mobilna navigacija" class="td-mmenu" style="position:fixed;inset:0;height:100vh;height:100dvh;background:#ffffff;padding:0 24px calc(32px + env(safe-area-inset-bottom));display:flex;flex-direction:column;z-index:70;overflow-y:auto;overscroll-behavior:contain">
+<div style="margin:0 -12px 8px;height:64px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;flex:none"><button onClick="{{ toggleMenu }}" aria-label="Zatvori meni" class="td-burger" data-open="true" style="width:44px;height:44px;padding:0;border:none;background:none;cursor:pointer;position:relative"><span></span><span></span></button><div style="display:flex;justify-content:center"><a href="#" onClick="{{ nav.home }}" aria-label="TopDrop, početna" style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#16130f"><span style="font-size:26px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap"><b style="font-weight:800">Top</b><span style="font-weight:300">Drop</span></span><span aria-hidden="true" style="width:26px;height:2px;border-radius:2px;background:#ffc400"></span></a></div><button onClick="{{ nav.cart }}" aria-label="Korpa" style="width:44px;height:44px;padding:0;border:none;background:transparent;color:#16130f;cursor:pointer;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M5 8h14l-1 12H6z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></button></div>
 <a href="#" onClick="{{ nav.home }}" class="td-mlink">Početna</a>
 <a href="#" onClick="{{ nav.shop }}" class="td-mlink">Shop</a>
 <a href="#" onClick="{{ nav.faq }}" class="td-mlink">FAQ</a>
@@ -1611,7 +1612,7 @@ class Component extends DCLogic {
     this.setState(next,()=>{const s=this.state;try{localStorage.setItem('na-route',JSON.stringify({page:s.page,slug:s.slug,cat:s.cat,post:s.post,legal:s.legal,f:s.f}));}catch(e){}});
     try{window.scrollTo(0,0);}catch(e){}
   }
-  lockBody(on){try{document.documentElement.style.overscrollBehavior=on?'none':'';}catch(e){}}
+  lockBody(on){try{const b=document.body,st=b.style;if(on){if(this._lockY!=null)return;this._lockY=window.scrollY||0;st.position='fixed';st.top=(-this._lockY)+'px';st.left='0';st.right='0';st.width='100%';st.overflow='hidden';}else{if(this._lockY==null)return;const y=this._lockY;this._lockY=null;st.position='';st.top='';st.left='';st.right='';st.width='';st.overflow='';window.scrollTo(0,y);}}catch(e){}}
   setF(patch){this.setState(s=>({f:{...s.f,...patch}}));}
   showToast(t){this.setState({toast:t});clearTimeout(this.tt);this.tt=setTimeout(()=>this.setState({toast:null}),2800);}
   vm(p){
@@ -1681,7 +1682,7 @@ class Component extends DCLogic {
     return{
       showAnnouncement:this.props.showAnnouncement??true,
       gridCols:m?'repeat(2,minmax(0,1fr))':'repeat(3,minmax(0,1fr))',cardGrid:m?'repeat(2,minmax(0,1fr))':'repeat(auto-fill,minmax(240px,1fr))',cardGap:m?'12px':'20px',
-      t,nav,legal,isMobile:m,isDesktop:!m,menuOpen:m&&s.menu,menuIcon:s.menu?'✕':'☰',menuLabel:s.menu?'Zatvori meni':'Otvori meni',mTop:(s.mTop||64)+'px',toggleMenu:(e)=>{const h=e&&e.currentTarget&&e.currentTarget.closest?e.currentTarget.closest('header'):null;this.setState({menu:!s.menu,mTop:h?Math.max(0,Math.round(h.getBoundingClientRect().bottom)):64});},
+      t,nav,legal,isMobile:m,isDesktop:!m,menuOpen:m&&s.menu,menuIcon:s.menu?'✕':'☰',menuLabel:s.menu?'Zatvori meni':'Otvori meni',mTop:(s.mTop||64)+'px',toggleMenu:()=>{this.lockBody(!s.menu);this.setState({menu:!s.menu});},
       heroH:m?760:640,
       heroBagMb:m?236:24,
       heroTrk:m?'115%':'170%',
