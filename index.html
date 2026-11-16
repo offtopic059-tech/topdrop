@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TopDrop | Patike</title>
+<meta name="description" content="TopDrop: patike za Srbiju. Plaćaš pouzećem, dostava 1–5 radnih dana.">
+<link rel="icon" type="image/png" href="assets/topdrop-favicon-64.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#ffffff;color:#16130f;font-family:Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+html,body{scrollbar-width:none}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+#td-pthumb{position:fixed;right:3px;top:0;width:2px;border-radius:2px;background:#cfcdc7;z-index:90;pointer-events:none;opacity:0;transition:opacity .2s}
+*{box-sizing:border-box}
+a{color:#16130f;text-decoration:none}
+a:hover{color:#484742}
+button,input,select,textarea{font-family:inherit}
+:focus-visible{outline:2px solid #16130f;outline-offset:2px}
+
+/* TopDrop hero animation: sneakers drop into the bag non-stop. N=8 shoes, one every 1.0s, loop 8.0s.
+   Adding a model: add a .td-shoe with the next --i, then set duration = N*1.0s and regenerate the tdDrop percentages. */
+.td-bag{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;transform-origin:50% 100%;animation:tdBag 1.0s infinite;animation-delay:0.97s}
+.td-track{position:absolute;left:-60%;right:-60%;top:calc(-1 * var(--trk,170%));bottom:45%;overflow:hidden;z-index:1;pointer-events:none}
+.td-shoe{position:absolute;left:50%;width:66%;top:-45%;transform:translateX(-50%);animation:tdDrop 8.0s infinite both;animation-delay:calc(var(--i) * 1.0s);will-change:top,transform}
+.td-shoe img{width:100%;display:block;filter:drop-shadow(3px 0 0 var(--ol,#fff)) drop-shadow(-3px 0 0 var(--ol,#fff)) drop-shadow(0 3px 0 var(--ol,#fff)) drop-shadow(0 -3px 0 var(--ol,#fff))}
+/* --ol = sticker outline per sneaker, a lighter/brighter (or darker) shade of its main color so it reads on its own background */
+/* Hero background follows each sneaker's main color (same 8.0s loop, fades in 0.08-0.4s after each sneaker starts, i.e. as it comes into view). Colors per sneaker (signature color: main color, or the accent when the shoe is mostly neutral), bg/text: nike-af1-bela #dcdee1/#16130f, nb-9060-bez #b1aa9b/#16130f, nike-airmax95 #1f7aa3/#ffffff, adidas-gazelle-zlatna #c4a265/#16130f, nb-9060-crna #4a4548/#ffffff, nb-9060-braon #7a6058/#ffffff, nike-crna #58575a/#ffffff, adidas-gazelle-zelena #4f6b57/#ffffff */
+.td-hero{clip-path:inset(0 -100vmax);animation:tdBg 8.0s infinite linear}
+@keyframes tdBg{0%{background-color:#4f6b57;box-shadow:0 0 0 100vmax #4f6b57;color:#ffffff}1.00%{background-color:#4f6b57;box-shadow:0 0 0 100vmax #4f6b57;color:#ffffff}5.00%{background-color:#dcdee1;box-shadow:0 0 0 100vmax #dcdee1;color:#16130f}13.50%{background-color:#dcdee1;box-shadow:0 0 0 100vmax #dcdee1;color:#16130f}17.50%{background-color:#b1aa9b;box-shadow:0 0 0 100vmax #b1aa9b;color:#16130f}26.00%{background-color:#b1aa9b;box-shadow:0 0 0 100vmax #b1aa9b;color:#16130f}30.00%{background-color:#1f7aa3;box-shadow:0 0 0 100vmax #1f7aa3;color:#ffffff}38.50%{background-color:#1f7aa3;box-shadow:0 0 0 100vmax #1f7aa3;color:#ffffff}42.50%{background-color:#c4a265;box-shadow:0 0 0 100vmax #c4a265;color:#16130f}51.00%{background-color:#c4a265;box-shadow:0 0 0 100vmax #c4a265;color:#16130f}55.00%{background-color:#4a4548;box-shadow:0 0 0 100vmax #4a4548;color:#ffffff}63.50%{background-color:#4a4548;box-shadow:0 0 0 100vmax #4a4548;color:#ffffff}67.50%{background-color:#7a6058;box-shadow:0 0 0 100vmax #7a6058;color:#ffffff}76.00%{background-color:#7a6058;box-shadow:0 0 0 100vmax #7a6058;color:#ffffff}80.00%{background-color:#58575a;box-shadow:0 0 0 100vmax #58575a;color:#ffffff}88.50%{background-color:#58575a;box-shadow:0 0 0 100vmax #58575a;color:#ffffff}92.50%{background-color:#4f6b57;box-shadow:0 0 0 100vmax #4f6b57;color:#ffffff}100%{background-color:#4f6b57;box-shadow:0 0 0 100vmax #4f6b57;color:#ffffff}}
+/* Footer tapes: two crossing marquee strips, faded, behind the big TOPDROP wordmark */
+.td-tapes{position:absolute;left:0;right:0;top:34px;height:150px;overflow:hidden;pointer-events:none;opacity:.22;z-index:0}
+.td-tape{position:absolute;left:-10%;width:120%;display:flex;overflow:hidden;white-space:nowrap;padding:14px 0}
+.td-tape--gold{top:52px;background:#ffc400;color:#16130f;transform:rotate(-3deg);z-index:2}
+.td-tape--black{top:46px;background:#ffffff;color:#16130f;transform:rotate(2.5deg);z-index:1}
+.td-track2{display:flex;flex:none;animation:tdTape 38s linear infinite}
+.td-tape--black .td-track2{animation-direction:reverse;animation-duration:46s}
+.td-item{display:inline-flex;align-items:center;gap:22px;padding-right:22px;font-size:20px;line-height:24px;font-weight:800;letter-spacing:.02em;text-transform:uppercase}
+.td-item i{font-style:normal;font-size:16px}
+@keyframes tdTape{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.td-track2{animation:none}}
+/* Limited block: torn black paper (jagged top/bottom edges via clip-path + soft shadow) */
+.td-torn-wrap{filter:drop-shadow(0 10px 18px rgba(22,19,15,.22))}
+.td-torn{clip-path:polygon(0.0% 15px,2.71% 18px,4.53% 4px,6.91% 4px,8.53% 2px,11.36% 9px,12.49% 18px,15.12% 9px,16.9% 18px,19.04% 11px,21.29% 9px,24.07% 11px,26.62% 11px,28.36% 2px,31.01% 2px,32.68% 6px,34.53% 6px,37.01% 11px,38.9% 3px,40.92% 11px,43.56% 9px,45.5% 5px,48.08% 11px,49.47% 9px,52.17% 5px,54.26% 15px,56.48% 8px,58.53% 9px,61.22% 14px,63.38% 4px,65.31% 5px,67.39% 15px,69.84% 12px,71.87% 4px,73.45% 18px,75.68% 15px,77.84% 8px,80.34% 3px,82.1% 5px,84.87% 15px,86.76% 15px,89.24% 11px,91.66% 4px,93.89% 12px,95.62% 3px,97.3% 14px,100.0% 14px,100.0% calc(100% - 14px),97.33% calc(100% - 4px),95.63% calc(100% - 12px),94.07% calc(100% - 8px),90.85% calc(100% - 8px),89.25% calc(100% - 8px),87.12% calc(100% - 15px),84.92% calc(100% - 6px),82.04% calc(100% - 9px),80.97% calc(100% - 11px),77.84% calc(100% - 4px),75.61% calc(100% - 11px),73.72% calc(100% - 2px),71.67% calc(100% - 4px),69.05% calc(100% - 9px),67.27% calc(100% - 9px),64.74% calc(100% - 3px),62.92% calc(100% - 18px),61.23% calc(100% - 18px),58.64% calc(100% - 3px),56.73% calc(100% - 2px),54.89% calc(100% - 3px),52.4% calc(100% - 5px),50.08% calc(100% - 6px),47.87% calc(100% - 11px),45.06% calc(100% - 18px),43.1% calc(100% - 12px),40.72% calc(100% - 11px),38.81% calc(100% - 9px),36.46% calc(100% - 6px),35.33% calc(100% - 6px),32.83% calc(100% - 18px),30.68% calc(100% - 15px),28.7% calc(100% - 12px),26.55% calc(100% - 18px),23.8% calc(100% - 12px),21.24% calc(100% - 8px),19.44% calc(100% - 8px),16.95% calc(100% - 9px),14.88% calc(100% - 12px),12.58% calc(100% - 2px),10.7% calc(100% - 11px),8.51% calc(100% - 8px),6.78% calc(100% - 3px),4.73% calc(100% - 12px),2.35% calc(100% - 3px),0.0% calc(100% - 12px));background-color:#16130f}
+/* Torn-paper buttons (same torn look as the Limited paper), colors unchanged */
+.td-tornbtn{border-radius:0 !important;clip-path:polygon(0.0% 2px,4.17% 2px,8.33% 2px,12.5% 3px,16.67% 2px,20.83% 2px,25.0% 2px,29.17% 1px,33.33% 2px,37.5% 1px,41.67% 2px,45.83% 1px,50.0% 0px,54.17% 0px,58.33% 2px,62.5% 2px,66.67% 0px,70.83% 1px,75.0% 0px,79.17% 0px,83.33% 3px,87.5% 3px,91.67% 0px,95.83% 2px,100.0% 4px,calc(100% - 1px) 25%,calc(100% - 0px) 50%,calc(100% - 1px) 75%,100.0% calc(100% - 0px),95.83% calc(100% - 0px),91.67% calc(100% - 1px),87.5% calc(100% - 0px),83.33% calc(100% - 1px),79.17% calc(100% - 1px),75.0% calc(100% - 0px),70.83% calc(100% - 1px),66.67% calc(100% - 1px),62.5% calc(100% - 0px),58.33% calc(100% - 1px),54.17% calc(100% - 3px),50.0% calc(100% - 4px),45.83% calc(100% - 1px),41.67% calc(100% - 1px),37.5% calc(100% - 0px),33.33% calc(100% - 1px),29.17% calc(100% - 2px),25.0% calc(100% - 1px),20.83% calc(100% - 0px),16.67% calc(100% - 2px),12.5% calc(100% - 1px),8.33% calc(100% - 3px),4.17% calc(100% - 3px),0.0% calc(100% - 2px),1px 75%,0px 50%,1px 25%)}
+.td-tabs::-webkit-scrollbar{display:none}
+.td-fl{position:relative;display:block;border:1px solid #dcdad5;border-radius:14px;background:#ffffff;transition:border-color .2s,box-shadow .2s;cursor:text}
+.td-fl:hover{border-color:#a9a7a1}
+.td-fl>span{position:absolute;left:16px;top:10px;font-size:12px;line-height:16px;font-weight:600;color:#63625c;pointer-events:none;transition:color .2s}
+.td-fl .td-in{display:block;width:100%;height:62px;padding:26px 16px 8px;border:none;border-radius:14px;background:transparent;font:inherit;font-size:16px;color:#16130f;outline:none}
+.td-fl[data-err="true"]{border-color:#c0392b !important;box-shadow:0 0 0 3px rgba(192,57,43,.1) !important}
+.td-fl[data-err="true"]>span{color:#c0392b !important}
+.td-ferr{font-size:12px;line-height:16px;font-weight:600;color:#c0392b;padding-left:4px}
+.td-in::placeholder{color:#b6b4ae}
+.td-fl:focus-within{border-color:#16130f;box-shadow:0 0 0 3px rgba(22,19,15,.08)}
+.td-fl:focus-within>span{color:#16130f}
+.td-stamp{transform:rotate(-4deg);animation:tdStamp .45s cubic-bezier(.2,.9,.3,1.2) both}
+@keyframes tdStamp{from{transform:rotate(-12deg) scale(1.6);opacity:0}to{transform:rotate(-4deg) scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.td-stamp,.td-check{animation:none;stroke-dashoffset:0}}
+.td-check{stroke-dasharray:24;stroke-dashoffset:24;animation:tdCheck .45s .3s ease-out forwards}
+@keyframes tdCheck{to{stroke-dashoffset:0}}
+.td-sortmenu{animation:tdMenu .18s ease-out both;transform-origin:top right}
+@keyframes tdMenu{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.td-sortopt{transition:color .15s}
+.td-sortopt:hover{color:#16130f !important}
+.td-tornbtn:focus-visible{background:#16130f !important;color:#ffc400 !important;outline:none}
+.td-faq-a{display:grid;transition:grid-template-rows .55s cubic-bezier(.22,.8,.24,1)}
+.td-aside{scrollbar-width:none}
+.td-aside::-webkit-scrollbar{display:none}
+.td-size{transition:background .15s,color .15s}
+.td-size[aria-pressed="false"]:hover{background:#e9e8e4 !important;color:#16130f !important}
+.td-crow{transition:padding .25s}
+.td-crow:hover{padding-left:12px !important}
+.td-crow .td-carr{transition:transform .25s}
+.td-crow:hover .td-carr{transform:translateX(4px)}
+@media (max-width:767px){.td-ann{font-size:10.5px !important;letter-spacing:.05em !important;white-space:nowrap;gap:8px !important}.td-hero{height:auto !important;flex-direction:column !important;align-items:stretch !important;justify-content:flex-start !important}.td-hero>.td-herobag{align-self:center;flex:none;height:230px !important;margin:205px 0 0 !important}.td-hero>.td-herotext{position:relative !important;top:auto !important;bottom:auto !important;transform:none !important;padding:28px 0 36px}}
+@media (max-width:767px){.td-opticon{display:none !important}}
+.td-burger span{position:absolute;left:11px;right:11px;height:1.5px;background:#16130f;border-radius:2px;transition:transform .3s cubic-bezier(.4,0,.2,1),top .3s cubic-bezier(.4,0,.2,1)}
+.td-burger span:first-child{top:17px}.td-burger span:last-child{top:25px}
+.td-burger[data-open="true"] span:first-child{top:21px;transform:rotate(45deg)}.td-burger[data-open="true"] span:last-child{top:21px;transform:rotate(-45deg)}
+.td-mmenu{animation:tdMm .28s ease-out both}@keyframes tdMm{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:none}}
+.td-mlink{display:block;padding:18px 0;border-bottom:1px solid #ecebe7;font-size:24px;line-height:30px;font-weight:600;letter-spacing:-.02em;color:#16130f}
+@media (max-width:767px){.td-bhead{align-items:center!important;gap:12px!important;margin-bottom:20px!important}.td-bhead h2{font-size:22px!important;line-height:28px!important}.td-bhead .td-bbtn{height:36px!important;padding:0 16px!important;font-size:13px!important}}
+.td-hm{display:none}@media (max-width:767px){.td-hd{display:none}.td-hm{display:inline}}
+@media (max-width:767px){.td-dots{display:none!important}.td-cinfo{gap:3px!important}.td-ccat{font-size:10px!important;line-height:14px!important}.td-cname{font-size:14px!important;line-height:19px!important;letter-spacing:-.01em}.td-cprow{margin-top:2px!important}.td-cprice{column-gap:6px!important;row-gap:0!important;flex-wrap:wrap!important}.td-cprice>*{white-space:nowrap}.td-cprice>span{font-size:14px!important;font-weight:700!important}.td-cprice s{font-size:11px!important}}
+@media (max-width:767px){.td-uhv{font-size:clamp(24px,9.4vw,40px)!important;line-height:1.05!important;white-space:nowrap}}
+.td-tk{transform:rotateY(-16deg) rotateX(6deg) rotate(-9deg);filter:drop-shadow(18px 30px 28px rgba(0,0,0,.55));animation:tdTkIn .9s cubic-bezier(.2,.8,.2,1) both}
+@keyframes tdTkIn{from{opacity:0;transform:rotateY(-30deg) rotateX(10deg) rotate(-16deg) translateY(24px)}to{opacity:1;transform:rotateY(-16deg) rotateX(6deg) rotate(-9deg)}}
+@media (max-width:767px){.td-ticket{flex:1 1 100%!important;margin:0 0 8px}.td-tk{zoom:.78}}
+@media (max-width:767px){.td-uhvbox{flex-direction:column!important;align-items:stretch!important;gap:28px!important}.td-uhvcol{display:contents!important}.td-uhvbox .td-uhv{order:0}.td-uhvbox .td-ticket{order:1;margin:0!important}.td-uhvbox .td-uhvbtn{order:2;align-self:center!important;margin-top:28px}}
+@media (max-width:767px){.td-trsec{padding:40px 0!important}
+.td-trs{display:flex!important;gap:12px!important;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 24px;padding:0 24px;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.td-trs::-webkit-scrollbar{display:none}
+.td-tri{flex:0 0 78%;scroll-snap-align:start;padding:22px 20px!important;background:#f4f3f0;border-radius:14px;gap:10px!important}
+.td-tri>svg{width:30px;height:30px}.td-tri>span:nth-of-type(1){font-size:20px!important;line-height:24px!important}.td-tri>span:nth-of-type(2){font-size:14px!important;line-height:20px!important}
+
+.td-trdots{display:flex;justify-content:center;gap:6px;margin-top:18px}
+.td-trdots button{width:6px;height:6px;padding:0;border:none;border-radius:999px;background:#d6d4ce;cursor:pointer;transition:width .3s ease,background .3s ease}
+.td-trdots button[data-on="true"]{width:20px;background:#16130f}}
+@media (max-width:767px){.td-shop{padding:20px 24px 72px!important}.td-shback{margin:0 0 6px!important;font-size:14px!important}
+.td-shhead{padding-bottom:0!important;border-bottom:none!important}.td-shhead h1{font-size:34px!important}
+.td-shgrid{padding-top:16px!important;gap:0!important}
+.td-bchips{display:flex;gap:8px;overflow-x:auto;margin:0 -24px;padding:0 24px 2px;scrollbar-width:none;scroll-padding:0 24px}
+.td-bchips::-webkit-scrollbar{display:none}
+.td-bchips button{flex:none;height:38px;padding:0 16px;border:none;border-radius:999px;background:#f4f3f0;color:#484742;font:inherit;font-size:14px;font-weight:500;white-space:nowrap;cursor:pointer;transition:background .2s,color .2s}
+.td-bchips button[data-on="true"]{background:#16130f;color:#ffffff;font-weight:600}
+.td-tools{position:sticky;top:64px;z-index:20;background:#ffffff;margin:8px -24px 16px!important;padding:10px 24px;border-bottom:1px solid #ecebe7;flex-wrap:nowrap!important}
+.td-sortmenu{right:-8px!important}}
+.td-fbtn{display:inline-flex;align-items:center;gap:8px;height:38px;padding:0 14px 0 12px;border:1px solid #dcdad4;border-radius:999px;background:#ffffff;color:#16130f;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.td-fcount{min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#ffc400;color:#16130f;font-size:11px;line-height:18px;font-weight:800;text-align:center}
+.td-sheetbg{position:fixed;inset:0;z-index:60;touch-action:none;background:rgba(22,19,15,.45);animation:tdFade .25s ease both}
+.td-sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;overscroll-behavior:contain;max-height:86vh;max-height:86dvh;display:flex;flex-direction:column;background:#ffffff;border-radius:18px 18px 0 0;padding-top:14px;animation:tdSheet .32s cubic-bezier(.2,.8,.2,1) both}
+.td-sheetbody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:4px 20px 24px;display:flex;flex-direction:column;gap:22px}
+.td-spill{height:40px;padding:0 16px;border:none;border-radius:999px;background:#f4f3f0;color:#484742;font:inherit;font-size:14px;font-weight:500;cursor:pointer}
+.td-spill[data-on="true"]{background:#16130f;color:#ffffff;font-weight:600}
+@keyframes tdFade{from{opacity:0}to{opacity:1}}@keyframes tdSheet{from{transform:translateY(100%)}to{transform:none}}
+.td-stock{display:inline-flex;align-items:center;gap:7px;flex:none;font-size:12px;line-height:16px;font-weight:600;color:#3f3e39;white-space:nowrap}
+.td-stock i{position:relative;width:8px;height:8px;border-radius:999px;background:#1fb35a;flex:none}
+.td-stock i::after{content:"";position:absolute;inset:0;border-radius:inherit;background:inherit;animation:tdPulse 1.8s cubic-bezier(.2,.6,.3,1) infinite}
+.td-stock[data-on="false"] i{background:#e5484d}.td-stock[data-on="false"]{color:#8a8882}
+@keyframes tdPulse{0%{transform:scale(1);opacity:.55}80%,100%{transform:scale(2.8);opacity:0}}
+@media (prefers-reduced-motion:reduce){.td-stock i::after{animation:none}}
+@media (max-width:767px){.td-cprow{flex-direction:column!important;align-items:flex-start!important;gap:6px!important}.td-stock{font-size:11px;gap:6px}.td-stock i{width:7px;height:7px}}
+.td-stock-lg{font-size:13px;gap:8px}.td-stock-lg i{width:9px;height:9px}
+@media (max-width:767px){.td-pdcrumb{font-size:13px!important;line-height:18px!important;gap:6px!important;margin:0 0 14px!important;flex-wrap:nowrap!important;white-space:nowrap;overflow:hidden}.td-pdcrumb>span:last-child{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.td-pdgrid{gap:22px!important}.td-pdmedia{margin:0 -24px}.td-pdmedia .td-stage{border-radius:0}
+.td-pdinfo{position:static!important;gap:22px!important}.td-pdtitle{font-size:26px!important;line-height:30px!important}.td-pdprice{font-size:22px!important;line-height:28px!important}
+.td-pdsizes{grid-template-columns:repeat(5,1fr)!important;gap:6px!important}.td-pdsizes button{height:44px!important}
+.td-pdnote{flex-direction:column;gap:2px!important;padding:12px 0!important;font-size:14px!important;line-height:20px!important}.td-pdnote>span:last-child{text-align:left!important}
+.td-pdrel{padding-top:56px!important}.td-pdrel h2{font-size:22px!important;margin-bottom:18px!important;white-space:nowrap}}
+.td-qty{display:inline-flex;align-items:center;gap:4px}
+.td-qty button{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border:none;border-radius:999px;background:#f4f3f0;color:#16130f;cursor:pointer;transition:background .15s,color .15s,opacity .15s}
+.td-qty button:hover{background:#16130f;color:#ffffff}.td-qty button[data-off="true"]{opacity:.3;pointer-events:none}
+.td-qty-sm button{width:30px;height:30px}.td-qty-sm span{min-width:28px!important}
+.td-qty span{min-width:36px;text-align:center;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums}
+@media (max-width:767px){.td-hidem{display:none}
+.td-msec{padding:20px 24px 56px!important}.td-mback{margin:0 0 6px!important;font-size:14px!important}
+.td-mh{margin:0 0 18px!important}.td-mh h1,.td-mh1{font-size:34px!important}.td-mh1{margin:0 0 22px!important}
+.td-cartgrid{gap:28px!important}.td-cline{grid-template-columns:84px minmax(0,1fr)!important;gap:14px!important;padding:18px 0!important}.td-cline>div:last-child>div:last-child{gap:10px!important}.td-cityzip{grid-template-columns:1fr 1fr!important;gap:10px!important}
+.td-sum{padding:22px 20px!important;border-radius:14px;gap:14px!important}
+.td-coform{gap:32px!important}.td-costeps{gap:28px!important}.td-cosec{padding-top:26px!important}
+.td-step{gap:10px!important;margin-bottom:16px!important}.td-step>span{font-size:26px!important}.td-step>h2{font-size:18px!important;line-height:24px!important}
+.td-opt{flex-wrap:wrap;align-items:flex-start!important;gap:4px 12px!important;padding:14px 16px!important}.td-opt>span:nth-of-type(2){order:1}.td-opt>span:last-child{order:2;margin-top:2px}.td-optprice{order:3;flex-basis:100%;font-size:14px!important}
+.td-opt>span:nth-of-type(2)>span:first-child{font-size:15px!important;line-height:21px!important}
+.td-sline{grid-template-columns:72px minmax(0,1fr)!important;gap:12px!important;padding:14px 0!important}.td-sline>div:last-child>span:nth-child(2){font-size:14px!important;line-height:19px!important}
+.td-slrow{flex-wrap:wrap;gap:2px 8px!important}
+.td-sum [style*="+ dostava"],.td-sum span[style*="font-size:12px;color:#63625c"]{white-space:nowrap}}
+@media (max-width:767px){.td-faqh{font-size:32px!important}.td-faqgrid{gap:28px!important}.td-faqq{padding:18px 18px!important;gap:14px!important}.td-faqq>span:first-child{font-size:15px!important;line-height:21px!important}.td-faq-p{padding:0 18px 20px 18px!important;font-size:14px!important;line-height:21px!important}}
+.td-card{border:1px solid #ebe9e4;border-radius:10px;overflow:hidden;gap:0!important;height:100%;background:#ffffff;transition:border-color .2s ease}
+.td-card:hover{border-color:#cfccc4}
+.td-card>.td-stage{border-radius:0;flex:none}
+.td-card>.td-cinfo{flex:1;padding:14px 16px 16px}
+.td-card .td-cprow{margin-top:auto!important;padding-top:10px;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-end!important;gap:8px!important}
+@media (max-width:767px){.td-card{border-radius:8px}.td-card>.td-cinfo{padding:10px 10px 12px}.td-card .td-cprow{padding-top:8px}}
+.td-badge{border-radius:4px;z-index:2}
+@media (max-width:767px){.td-badge{top:7px!important;left:7px!important;padding:3px 6px!important;font-size:8px!important;line-height:10px!important;letter-spacing:.06em!important;border-radius:3px}}
+.td-frow{transition:color .15s}
+.td-frow:hover{color:#16130f !important}
+.td-more{transition:opacity .35s ease .05s}
+.td-faq-p{transition:opacity .45s ease .08s,transform .55s cubic-bezier(.22,.8,.24,1)}
+.td-faq-v{transform-origin:12px 12px;transition:transform .45s cubic-bezier(.22,.8,.24,1)}
+@media (prefers-reduced-motion:reduce){.td-faq-a,.td-faq-p,.td-faq-v{transition:none}}
+.td-stage{position:relative;aspect-ratio:1;overflow:hidden;background:#151413 url(assets/studio-pozadina.webp) center/cover no-repeat}
+.td-stage-shoe{position:absolute;left:7%;right:7%;top:23%;bottom:27.8%;transition:transform .4s cubic-bezier(.2,.7,.3,1)}
+.td-stage-shoe img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;filter:brightness(.88) contrast(1.06) saturate(.94) drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.td-stage-shadow{position:absolute;left:13%;right:13%;top:70.4%;height:3.6%;border-radius:50%;background:radial-gradient(50% 50% at 50% 50%,rgba(0,0,0,.7),rgba(0,0,0,.35) 45%,rgba(0,0,0,0) 72%);transition:transform .4s cubic-bezier(.2,.7,.3,1),opacity .4s}
+.td-card:hover .td-stage-shoe,.td-card.td-hover .td-stage-shoe{transform:translateY(-4%)}
+.td-card:hover .td-stage-shadow,.td-card.td-hover .td-stage-shadow{transform:scaleX(.88);opacity:.65}
+@media (prefers-reduced-motion:reduce){.td-stage-shoe,.td-stage-shadow{transition:none}}
+.td-field::placeholder{color:#a3a29c}
+.td-field:focus,.td-field:focus-visible{outline:none;box-shadow:0 1px 0 #16130f}
+.td-handle{text-decoration:underline;text-decoration-color:#e9b52c;text-decoration-thickness:3px;text-underline-offset:7px;text-decoration-skip-ink:none}
+.td-handle:hover{color:#484742}
+.td-handle svg{transition:transform .2s}
+.td-handle:hover svg{transform:translate(3px,-3px)}
+/* Protect hero images from easy saving: no right-click "Save image", no drag, no long-press menu on phones */
+.td-bag,.td-shoe img{pointer-events:none;-webkit-user-drag:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.td-lock{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
+@keyframes tdDrop{0%{top:-45%;transform:translateX(-50%) rotate(calc(var(--dir) * 10deg));animation-timing-function:cubic-bezier(.2,.75,.3,1)}5.25%{top:30%;transform:translateX(-50%) rotate(calc(var(--dir) * -4deg));animation-timing-function:ease-in-out}8.50%{top:26%;transform:translateX(-50%) rotate(calc(var(--dir) * -1deg));animation-timing-function:cubic-bezier(.55,0,.9,.4)}12.50%{top:106%;transform:translateX(-50%) rotate(calc(var(--dir) * -82deg))}100%{top:106%;transform:translateX(-50%) rotate(calc(var(--dir) * -82deg))}}
+@keyframes tdBag{0%{transform:none}9%{transform:translateY(2%) scale(1.03,.96)}23%{transform:scale(.99,1.01) rotate(-1deg)}36%{transform:rotate(.6deg)}50%{transform:none}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.td-shoe{display:none}.td-bag,.td-hero{animation:none}}
+</style>
+</helmet>
+<div style="min-height:100vh;background:#ffffff;color:#16130f;font-family:Manrope,system-ui,sans-serif">
+
+<sc-if value="{{ showAnnouncement }}" hint-placeholder-val="{{ true }}">
+<div class="td-ann" style="background:#16130f;color:#ffffff;font-size:12px;line-height:16px;letter-spacing:.08em;text-transform:uppercase;text-align:center;padding:8px 16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffc400" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2 M15 18H9 M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14 M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0"/></svg><span>Preko 17.500 RSD dostava ide na nas</span></div>
+</sc-if>
+
+<header style="position:sticky;top:0;z-index:40;background:#ffffff">
+<sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+<div style="max-width:1120px;margin:0 auto;padding:0 24px;height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+<a href="#" onClick="{{ nav.home }}" aria-label="TopDrop, početna" style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#16130f"><span style="font-size:26px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap"><b style="font-weight:800">Top</b><span style="font-weight:300">Drop</span></span><span aria-hidden="true" style="width:26px;height:2px;border-radius:2px;background:#ffc400"></span></a>
+
+<nav aria-label="Glavna navigacija" style="display:flex;gap:36px;font-size:18px;line-height:24px;font-weight:500">
+<a href="#" onClick="{{ nav.shop }}">Shop</a>
+<a href="#" onClick="{{ nav.faq }}">FAQ</a>
+<a href="#" onClick="{{ nav.contact }}">Kontakt</a>
+</nav>
+
+<div style="display:flex;align-items:center;gap:8px">
+<button onClick="{{ nav.cart }}" aria-label="Korpa, artikala: {{ cartCount }}" style="position:relative;width:48px;height:48px;padding:0;border:none;background:transparent;color:#16130f;cursor:pointer;display:flex;align-items:center;justify-content:flex-end" style-hover="color:#484742"><svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" style="margin-right:-4px" stroke-linejoin="round" stroke-linecap="round"><path d="M5 8h14l-1 12H6z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><sc-if value="{{ cartCount }}"><span style="position:absolute;top:3px;right:-8px;min-width:18px;height:18px;border-radius:999px;background:#e9b52c;color:#16130f;font-weight:700;font-size:11px;line-height:18px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px">{{ cartCount }}</span></sc-if></button>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+<div style="padding:0 12px;height:64px;display:grid;grid-template-columns:44px 1fr 44px;align-items:center">
+<button onClick="{{ toggleMenu }}" aria-label="{{ menuLabel }}" aria-expanded="{{ menuOpen }}" class="td-burger" data-open="{{ menuOpen }}" style="width:44px;height:44px;padding:0;border:none;background:none;cursor:pointer;position:relative"><span></span><span></span></button>
+<div style="display:flex;justify-content:center"><a href="#" onClick="{{ nav.home }}" aria-label="TopDrop, početna" style="display:inline-flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:#16130f"><span style="font-size:26px;line-height:20px;letter-spacing:.01em;text-transform:uppercase;white-space:nowrap"><b style="font-weight:800">Top</b><span style="font-weight:300">Drop</span></span><span aria-hidden="true" style="width:26px;height:2px;border-radius:2px;background:#ffc400"></span></a></div>
+<button onClick="{{ nav.cart }}" aria-label="Korpa, artikala: {{ cartCount }}" style="position:relative;width:44px;height:44px;padding:0;border:none;background:transparent;color:#16130f;cursor:pointer;display:flex;align-items:center;justify-content:center" style-hover="color:#484742"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M5 8h14l-1 12H6z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg><sc-if value="{{ cartCount }}"><span style="position:absolute;top:3px;right:-8px;min-width:18px;height:18px;border-radius:999px;background:#e9b52c;color:#16130f;font-weight:700;font-size:11px;line-height:18px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px">{{ cartCount }}</span></sc-if></button>
+</div>
+</sc-if>
+<sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+<nav aria-label="Mobilna navigacija" class="td-mmenu" style="position:fixed;left:0;right:0;top:{{ mTop }};bottom:0;background:#ffffff;padding:8px 24px 32px;display:flex;flex-direction:column;z-index:50">
+<a href="#" onClick="{{ nav.home }}" class="td-mlink">Početna</a>
+<a href="#" onClick="{{ nav.shop }}" class="td-mlink">Shop</a>
+<a href="#" onClick="{{ nav.faq }}" class="td-mlink">FAQ</a>
+<a href="#" onClick="{{ nav.contact }}" class="td-mlink">Kontakt</a>
+<div style="margin-top:auto;display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:20px;color:#63625c"><a href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" style="color:#16130f;font-weight:600">@topdropstore</a><a href="mailto:offtopic059@gmail.com" style="color:#63625c">offtopic059@gmail.com</a></div>
+</nav>
+</sc-if>
+</header>
+
+<main>
+<!-- HOME -->
+<sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+<section style="max-width:1120px;margin:0 auto;padding:0 24px">
+<div class="td-hero" style="position:relative;height:clamp(420px,calc(100svh - 104px),{{ heroH }}px);overflow:hidden;display:flex;align-items:flex-end;justify-content:center">
+<div class="td-lock td-herobag" onContextMenu="{{ blockMenu }}" style="--trk:{{ heroTrk }};position:relative;height:38%;aspect-ratio:620/980;max-width:100%;margin-bottom:{{ heroBagMb }}px"><img class="td-bag" draggable="false" src="assets/hero-kesa-zadnji.webp" alt="" aria-hidden="true"><div class="td-track" aria-hidden="true"><div class="td-shoe" style="--i:0;--dir:1;--ol:#ffffff"><img draggable="false" src="assets/patike/nike-af1-bela.webp" alt=""></div><div class="td-shoe" style="--i:1;--dir:-1;--ol:#efe4cf"><img draggable="false" src="assets/patike/nb-9060-bez.webp" alt=""></div><div class="td-shoe" style="--i:2;--dir:1;--ol:#6fd0ff"><img draggable="false" src="assets/patike/nike-airmax95.webp" alt=""></div><div class="td-shoe" style="--i:3;--dir:-1;--ol:#ffe08a"><img draggable="false" src="assets/patike/adidas-gazelle-zlatna.webp" alt=""></div><div class="td-shoe" style="--i:4;--dir:-1;--ol:#0d0b0c"><img draggable="false" src="assets/patike/nb-9060-crna.webp" alt=""></div><div class="td-shoe" style="--i:5;--dir:-1;--ol:#d2ae98"><img draggable="false" src="assets/patike/nb-9060-braon.webp" alt=""></div><div class="td-shoe" style="--i:6;--dir:1;--ol:#0d0b0c"><img draggable="false" src="assets/patike/nike-crna.webp" alt=""></div><div class="td-shoe" style="--i:7;--dir:-1;--ol:#9fe0b4"><img draggable="false" src="assets/patike/adidas-gazelle-zelena.webp" alt=""></div></div><img class="td-bag" draggable="false" src="assets/hero-kesa-prednji.webp" alt="TopDrop kesa u koju upadaju patike" style="z-index:2"></div>
+<div class="td-herotext" style="position:absolute;left:0;right:0;{{ heroBarPos }};z-index:3;display:flex;flex-wrap:wrap;align-items:{{ heroBarAlign }};justify-content:space-between;gap:16px 24px;pointer-events:none">
+<div style="display:flex;flex-direction:column;gap:12px;max-width:{{ heroTextW }}px;color:inherit;pointer-events:auto"><h1 style="margin:0;font-size:{{ heroTitle }}px;line-height:1.05;font-weight:800;letter-spacing:-.02em;text-transform:uppercase">Pravi stil.<br>Pravi izbor.</h1><sc-if value="{{ heroLead }}"><p style="margin:0;font-size:16px;line-height:24px">{{ heroLead }}</p></sc-if>
+<button class="td-tornbtn" onClick="{{ nav.shop }}" style="pointer-events:auto;align-self:flex-start;margin-top:12px;height:52px;padding:0 32px;border-radius:999px;border:none;background:#ffc400;color:#16130f;font-size:16px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center" style-hover="background:#f0b400">Pogledaj patike</button></div>
+</div>
+<sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}"><p style="position:absolute;right:0;bottom:32px;z-index:3;margin:0;font-size:16px;line-height:24px;font-weight:500;color:inherit;text-align:right;white-space:nowrap">Stil, udobnost i kvalitet.<br>Bez kompromisa.</p></sc-if>
+</div>
+</section>
+
+<section style="max-width:1120px;margin:0 auto;padding:96px 24px 0">
+<div class="td-bhead" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:32px"><h2 style="margin:0;font-size:{{ t.h2 }}px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-transform:uppercase;white-space:nowrap">Biraj brend</h2><a class="td-tornbtn td-bbtn" href="#" onClick="{{ nav.allBrands }}" style="height:44px;padding:0 22px;border-radius:999px;background:#ffc400;color:#16130f;font-size:15px;font-weight:700;display:inline-flex;align-items:center;white-space:nowrap" style-hover="background:#f0b400;color:#16130f">Svi brendovi</a></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px">
+<sc-for list="{{ catTiles }}" as="c" hint-placeholder-count="3">
+<a href="#" onClick="{{ c.open }}" style="display:flex;flex-direction:column;gap:12px">
+<div style="aspect-ratio:16/9;background:#f2f2f0;position:relative;display:flex;align-items:center;justify-content:center" style-hover="background:#e9e9e6"><sc-if value="{{ c.logo }}"><img src="{{ c.logo }}" alt="{{ c.label }} logo" draggable="false" style="width:{{ c.logoW }};height:auto;display:block;user-select:none"></sc-if><sc-if value="{{ c.noLogo }}"><span style="font-family:Manrope,system-ui,sans-serif;font-size:12px;color:#63625c;text-align:center;padding:16px">{{ c.ph }}</span></sc-if></div>
+</a>
+</sc-for>
+</div>
+</section>
+
+<sc-if value="{{ hasProducts }}" hint-placeholder-val="{{ false }}">
+<section style="max-width:1120px;margin:0 auto;padding:96px 24px 0">
+<div class="td-bhead" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:32px"><h2 style="margin:0;font-size:{{ t.h2 }}px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-transform:uppercase;white-space:nowrap"><span class="td-hd">Ove se najviše uzimaju</span><span class="td-hm">Preporučujemo</span></h2><a class="td-tornbtn td-bbtn" href="#" onClick="{{ nav.shop }}" style="height:44px;padding:0 22px;border-radius:999px;background:#ffc400;color:#16130f;font-size:15px;font-weight:700;display:inline-flex;align-items:center;white-space:nowrap" style-hover="background:#f0b400;color:#16130f">Vidi sve</a></div>
+<div style="display:grid;grid-template-columns:{{ cardGrid }};gap:{{ cardGap }}">
+<sc-for list="{{ newProducts }}" as="p" hint-placeholder-count="4">
+<div role="button" tabIndex="0" onClick="{{ p.open }}" class="td-card" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;min-width:0">
+<div class="td-stage"><div class="td-stage-shadow"></div><sc-if value="{{ p.cardImg }}"><div class="td-stage-shoe td-lock"><img src="{{ p.cardImg }}" alt="{{ p.name }}" draggable="false" decoding="async"></div></sc-if><sc-if value="{{ p.badge }}"><span class="td-badge" style="position:absolute;top:10px;left:10px;padding:5px 8px;background:{{ p.badgeBg }};color:{{ p.badgeFg }};font-size:10px;line-height:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">{{ p.badge }}</span></sc-if></div>
+<div class="td-cinfo" style="display:flex;flex-direction:column;gap:2px">
+<span class="td-ccat" style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c">{{ p.catLabel }}</span>
+<span class="td-cname" style="font-size:16px;line-height:22px;font-weight:700">{{ p.name }}</span>
+<div class="td-cprow" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px"><span class="td-cprice" style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-size:15px;line-height:20px;font-weight:600">{{ p.priceFmt }}</span><sc-if value="{{ p.compareFmt }}"><s style="font-size:12px;line-height:16px;color:#63625c">{{ p.compareFmt }}</s></sc-if></span><span class="td-stock" data-on="{{ p.stockOn }}"><i aria-hidden="true"></i>{{ p.stockLabel }}</span></div>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-if>
+
+<section style="max-width:1120px;margin:0 auto;padding:96px 24px 0">
+<div class="td-torn-wrap"><div class="td-torn td-uhvbox" style="color:#ffffff;padding:calc({{ t.pad }}px + 56px) {{ t.pad }}px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:48px;position:relative">
+<div class="td-uhvcol" style="flex:1 1 320px;display:flex;flex-direction:column;gap:24px">
+<h2 class="td-uhv" style="margin:0;font-size:{{ t.h1 }}px;line-height:1;font-weight:400;letter-spacing:-.03em;text-transform:uppercase">Uhvati trend.<br>Istakni stil.<br><b style="font-weight:800">Uštedi.</b></h2>
+<button class="td-tornbtn td-uhvbtn" onClick="{{ nav.limited }}" style="align-self:flex-start;height:48px;padding:0 24px;border-radius:999px;border:none;background:#ffffff;color:#16130f;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#f1efe9">Uzmi dok ima →</button>
+</div>
+<sc-if value="{{ limitedPick.has }}">
+<div class="td-ticket" style="flex:0 1 360px;display:flex;justify-content:center;perspective:1100px">
+<div class="td-tk" style="position:relative;width:260px;height:360px;flex:none;color:#16130f">
+<svg aria-hidden="true" width="260" height="360" viewBox="0 0 260 360" style="position:absolute;inset:0;overflow:visible"><defs><clipPath id="tdTkClip"><path d="M10 0H110A20 20 0 0 0 150 0H250A10 10 0 0 0 260 10V86A10 10 0 0 0 260 106V350A10 10 0 0 0 250 360H10A10 10 0 0 0 0 350V106A10 10 0 0 0 0 86V10A10 10 0 0 0 10 0Z"/></clipPath><pattern id="tdTkDots" width="14" height="14" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.6" fill="#16130f" fill-opacity=".06"/><circle cx="10" cy="10" r="1.6" fill="#16130f" fill-opacity=".06"/></pattern><linearGradient id="tdTkSheen" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".38"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient></defs><path d="M10 0H110A20 20 0 0 0 150 0H250A10 10 0 0 0 260 10V86A10 10 0 0 0 260 106V350A10 10 0 0 0 250 360H10A10 10 0 0 0 0 350V106A10 10 0 0 0 0 86V10A10 10 0 0 0 10 0Z" fill="#ffc400"/><g clip-path="url(#tdTkClip)"><rect width="260" height="360" fill="url(#tdTkDots)"/><rect width="260" height="360" fill="url(#tdTkSheen)"/></g><line x1="18" y1="96" x2="242" y2="96" stroke="#16130f" stroke-opacity=".45" stroke-width="1.5" stroke-dasharray="3 5" stroke-linecap="round"/></svg>
+<div style="position:absolute;left:0;right:0;top:0;height:96px;display:flex;align-items:center;justify-content:center;padding-top:8px">
+<div aria-hidden="true" style="width:184px;height:52px;background:#ffffff;border-radius:6px;padding:7px 10px 4px;display:flex;flex-direction:column;gap:3px"><div style="flex:1;display:flex;gap:2px;overflow:hidden"><sc-for list="{{ barcode }}" as="b"><span style="width:{{ b.w }}px;flex:none;background:#16130f"></span></sc-for><sc-for list="{{ barcode }}" as="b"><span style="width:{{ b.w }}px;flex:none;background:#16130f"></span></sc-for></div><span style="font-size:7px;line-height:8px;letter-spacing:.42em;color:#16130f;text-align:center;font-variant-numeric:tabular-nums">0 2026 LTD {{ limitedPick.off }} 300</span></div>
+</div>
+<div style="position:absolute;left:0;right:0;top:96px;bottom:0;padding:22px 24px 26px;display:flex;flex-direction:column;justify-content:space-between">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:10px;line-height:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase">TopDrop · Kupon</span><span style="font-size:10px;line-height:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,19,15,.55)">№ LTD-26</span></div>
+<div style="display:flex;flex-direction:column;gap:10px">
+<span style="font-size:88px;line-height:.8;font-weight:800;letter-spacing:-.07em;font-variant-numeric:tabular-nums;margin-left:-4px">−{{ limitedPick.off }}<span style="font-size:.42em;letter-spacing:-.02em;vertical-align:top;margin-left:3px">%</span></span>
+<span style="font-size:13px;line-height:17px;font-weight:800;text-transform:uppercase;letter-spacing:.02em">{{ limitedPick.pre }} {{ limitedPick.name }}</span>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding-top:14px;border-top:1px solid rgba(22,19,15,.18)">
+<span style="display:flex;flex-direction:column;gap:4px"><span style="font-size:10px;line-height:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,19,15,.55)">Bila</span><span style="font-size:14px;font-weight:600;color:rgba(22,19,15,.55);text-decoration:line-through;white-space:nowrap">{{ limitedPick.oldFmt }}</span></span>
+<span style="display:flex;flex-direction:column;gap:4px"><span style="font-size:10px;line-height:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:rgba(22,19,15,.55)">Sada</span><span style="font-size:15px;font-weight:800;white-space:nowrap">{{ limitedPick.newFmt }}</span></span>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+</div></div>
+</section>
+
+<section class="td-trsec" style="max-width:1120px;margin:0 auto;padding:64px 24px">
+<div class="td-trs" onScroll="{{ onTrustScroll }}" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:32px">
+<sc-for list="{{ trust }}" as="x" hint-placeholder-count="4">
+<div class="td-tri" style="display:flex;flex-direction:column;gap:12px;padding-right:16px">
+<svg aria-hidden="true" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="{{ x.d }}"/></svg>
+<span style="font-size:24px;line-height:28px;font-weight:800;letter-spacing:-.02em">{{ x.value }}</span>
+<span style="font-size:15px;line-height:22px;color:#484742">{{ x.label }}<sc-if value="{{ x.ig }}"> <a href="{{ x.ig }}" target="_blank" rel="noopener noreferrer" style="color:#16130f;font-weight:700;text-decoration:underline;text-underline-offset:3px">@topdropstore</a>.</sc-if></span>
+</div>
+</sc-for>
+</div>
+<sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}"><div class="td-trdots" role="tablist" aria-label="Prednosti"><sc-for list="{{ trustDots }}" as="d"><button role="tab" aria-label="{{ d.label }}" aria-selected="{{ d.on }}" data-on="{{ d.on }}" onClick="{{ d.go }}"></button></sc-for></div></sc-if>
+</section>
+
+</sc-if>
+
+<!-- SHOP -->
+<sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}">
+<section class="td-shop" style="max-width:1120px;margin:0 auto;padding:48px 24px 96px">
+<button class="td-shback" onClick="{{ goBack }}" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;margin:0 0 24px;padding:8px 0;border:none;background:none;color:#16130f;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="color:#484742"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5 M12 19l-7-7 7-7"/></svg>Nazad</button>
+<div class="td-shhead" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px;padding-bottom:24px;border-bottom:1px solid #16130f">
+<h1 style="margin:0;font-size:{{ t.h1 }}px;line-height:1;font-weight:800;letter-spacing:-.04em;text-transform:uppercase">{{ shop.title }}</h1>
+</div>
+<div class="td-shgrid" style="display:grid;grid-template-columns:{{ shop.layout }};gap:24px 48px;align-items:start;padding-top:24px">
+<sc-if value="{{ filtersVisible }}">
+<aside aria-label="Filteri" class="td-aside" onScroll="{{ shop.onAsideScroll }}" style="position:{{ shop.asidePos }};top:96px;max-height:{{ shop.asideMax }};overflow-y:auto;overscroll-behavior:contain;padding-right:14px;padding-bottom:40px;display:flex;flex-direction:column;gap:28px">
+<sc-if value="{{ shop.thumbOn }}"><span aria-hidden="true" style="position:absolute;right:0;width:2px;border-radius:2px;background:#cfcdc7;top:{{ shop.thumbTop }}px;height:{{ shop.thumbH }}px;pointer-events:none"></span></sc-if>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f;margin-bottom:4px">Brend</span><sc-for list="{{ shop.brandTop }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" class="td-frow" style="display:flex;align-items:center;gap:10px;width:100%;padding:6px 0;border:none;background:none;font:inherit;font-size:15px;font-weight:{{ c.w }};color:{{ c.fg }};cursor:pointer;text-align:left"><span style="flex:1">{{ c.label }}</span></button></sc-for><sc-if value="{{ shop.hasMore }}"><div class="td-faq-a" style="grid-template-rows:{{ shop.moreRows }}"><div style="overflow:hidden;min-height:0"><div class="td-more" style="display:flex;flex-direction:column;gap:8px;opacity:{{ shop.moreOp }}"><sc-for list="{{ shop.brandMore }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" class="td-frow" style="display:flex;align-items:center;gap:10px;width:100%;padding:6px 0;border:none;background:none;font:inherit;font-size:15px;font-weight:{{ c.w }};color:{{ c.fg }};cursor:pointer;text-align:left"><span style="flex:1">{{ c.label }}</span></button></sc-for></div></div></div>
+<button type="button" onClick="{{ shop.toggleMore }}" style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;margin-top:6px;padding:0;border:none;background:none;font:inherit;font-size:14px;font-weight:600;color:#16130f;cursor:pointer" style-hover="color:#484742"><span style="text-decoration:underline;text-underline-offset:4px">{{ shop.moreLabel }}</span><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="transition:transform .35s;transform:{{ shop.moreRot }}"><path d="M6 9l6 6 6-6"/></svg></button></sc-if></div>
+<div style="display:flex;flex-direction:column;gap:12px;padding-top:24px;border-top:1px solid #e3e3e0"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f">Veličina</span><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px"><sc-for list="{{ shop.sizeChips }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" class="td-size" style="height:38px;border:none;border-radius:6px;background:{{ c.bg }};color:{{ c.fg }};font:inherit;font-size:14px;font-weight:{{ c.sw }};cursor:pointer">{{ c.label }}</button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:8px;padding-top:24px;border-top:1px solid #e3e3e0"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f;margin-bottom:4px">Stanje</span><sc-for list="{{ shop.stockList }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" class="td-frow" style="display:flex;align-items:center;gap:10px;width:100%;padding:6px 0;border:none;background:none;font:inherit;font-size:15px;font-weight:{{ c.w }};color:{{ c.fg }};cursor:pointer;text-align:left"><span style="flex:1">{{ c.label }}</span></button></sc-for></div>
+<sc-if value="{{ shop.anyFilter }}"><button onClick="{{ resetFilters }}" style="align-self:flex-start;padding:0;border:none;background:none;font:inherit;font-size:14px;font-weight:600;color:#16130f;text-decoration:underline;text-underline-offset:4px;cursor:pointer">Poništi filtere</button></sc-if>
+</aside>
+</sc-if>
+<div style="min-width:0">
+<sc-if value="{{ shop.showTools }}">
+<div class="td-tools" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px">
+<div style="display:flex;align-items:center;gap:12px"><sc-if value="{{ showFilterBtn }}"><button class="td-fbtn" onClick="{{ toggleFilters }}" aria-haspopup="dialog"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg><span>Filteri</span><sc-if value="{{ shop.fCount }}"><span class="td-fcount">{{ shop.fCount }}</span></sc-if></button></sc-if></div>
+<div class="td-sort" style="position:relative">
+<button type="button" onClick="{{ shop.toggleSort }}" aria-haspopup="listbox" aria-expanded="{{ shop.sortOpen }}" style="display:inline-flex;align-items:center;gap:6px;padding:8px 0;border:none;background:none;font:inherit;font-size:14px;color:#8a8882;cursor:pointer"><span>Sortiraj:</span><span style="color:#16130f;font-weight:600">{{ shop.sortLabel }}</span><svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="margin-left:2px;transition:transform .25s;transform:{{ shop.sortRot }}"><path d="M6 9l6 6 6-6"/></svg></button>
+<sc-if value="{{ shop.sortOpen }}"><div onClick="{{ shop.closeSort }}" style="position:fixed;inset:0;z-index:30"></div><div role="listbox" class="td-sortmenu" style="position:absolute;right:0;top:calc(100% + 4px);z-index:31;min-width:200px;padding:8px 0;background:#ffffff;border:1px solid #ebe9e4;border-radius:4px;box-shadow:0 10px 30px rgba(22,19,15,.08)"><sc-for list="{{ shop.sortOpts }}" as="o"><button type="button" role="option" aria-selected="{{ o.active }}" onClick="{{ o.onClick }}" class="td-sortopt" style="display:flex;align-items:center;gap:10px;width:100%;padding:9px 18px;border:none;background:none;font:inherit;font-size:14px;font-weight:{{ o.w }};color:{{ o.fg }};cursor:pointer;text-align:left">{{ o.label }}</button></sc-for></div></sc-if>
+</div>
+</div>
+</sc-if>
+<div>
+<sc-if value="{{ shop.loading }}">
+<div style="display:grid;grid-template-columns:{{ gridCols }};gap:{{ cardGap }}"><sc-for list="{{ skeletons }}" as="k"><div style="display:flex;flex-direction:column;gap:12px"><div class="td-stage"></div><div style="height:16px;width:70%;background:#f2f2f0"></div><div style="height:12px;width:40%;background:#f2f2f0"></div></div></sc-for></div>
+</sc-if>
+<sc-if value="{{ shop.showGrid }}">
+<div style="display:grid;grid-template-columns:{{ gridCols }};gap:{{ cardGap }}">
+<sc-for list="{{ shop.items }}" as="p">
+<div role="button" tabIndex="0" onClick="{{ p.open }}" class="td-card" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;min-width:0">
+<div class="td-stage"><div class="td-stage-shadow"></div><sc-if value="{{ p.cardImg }}"><div class="td-stage-shoe td-lock"><img src="{{ p.cardImg }}" alt="{{ p.name }}" draggable="false" decoding="async"></div></sc-if><sc-if value="{{ p.badge }}"><span class="td-badge" style="position:absolute;top:10px;left:10px;padding:5px 8px;background:{{ p.badgeBg }};color:{{ p.badgeFg }};font-size:10px;line-height:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">{{ p.badge }}</span></sc-if></div>
+<div class="td-cinfo" style="display:flex;flex-direction:column;gap:2px">
+<span class="td-ccat" style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c">{{ p.catLabel }}</span>
+<span class="td-cname" style="font-size:16px;line-height:22px;font-weight:700">{{ p.name }}</span>
+<div class="td-cprow" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px"><span class="td-cprice" style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-size:15px;line-height:20px;font-weight:600">{{ p.priceFmt }}</span><sc-if value="{{ p.compareFmt }}"><s style="font-size:12px;line-height:16px;color:#63625c">{{ p.compareFmt }}</s></sc-if></span><span class="td-stock" data-on="{{ p.stockOn }}"><i aria-hidden="true"></i>{{ p.stockLabel }}</span></div>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ shop.soon }}">
+<div style="padding:96px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;border:1px dashed #cfcfca"><span style="font-size:32px;line-height:40px;font-weight:700;letter-spacing:-.02em">Proizvodi stižu uskoro</span><p style="margin:0;font-size:16px;line-height:24px;color:#63625c;max-width:440px">Kolekcija se upravo dodaje. Za modele i veličine koje te zanimaju javi nam se u Instagram DM.</p><a class="td-tornbtn" href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" style="height:48px;padding:0 24px;background:#e9b52c;color:#16130f;font-size:16px;font-weight:700;display:inline-flex;align-items:center" style-hover="background:#d19a12">Piši nam @topdropstore</a></div>
+</sc-if>
+<sc-if value="{{ shop.empty }}">
+<div style="padding:96px 24px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:16px;border:1px dashed #cfcfca"><span style="font-size:32px;line-height:40px;font-weight:700;letter-spacing:-.02em">Ništa ne odgovara ovim filterima</span><p style="margin:0;font-size:16px;line-height:24px;color:#63625c">Probaj nešto drugo ili poništi filtere.</p><button class="td-tornbtn" onClick="{{ resetFilters }}" style="height:48px;padding:0 24px;border-radius:999px;border:none;background:#e9b52c;color:#16130f;font-size:16px;font-weight:600;cursor:pointer" style-hover="background:#d19a12">Poništi filtere</button></div>
+</sc-if>
+</div>
+</div>
+<sc-if value="{{ mSheet }}" hint-placeholder-val="{{ false }}">
+<div class="td-sheetbg" onClick="{{ closeFilters }}"></div>
+<div class="td-sheet" role="dialog" aria-modal="true" aria-label="Filteri">
+<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 20px 14px"><span style="font-size:18px;line-height:24px;font-weight:700;letter-spacing:-.01em">Filteri</span><button onClick="{{ closeFilters }}" aria-label="Zatvori filtere" style="width:36px;height:36px;margin-right:-8px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:#16130f;cursor:pointer"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div class="td-sheetbody">
+<div style="display:flex;flex-direction:column;gap:12px"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f">Brend</span><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ shop.brandSheet }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" class="td-spill" data-on="{{ c.active }}">{{ c.label }}</button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:12px;padding-top:22px;border-top:1px solid #ecebe7"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f">Veličina</span><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px"><sc-for list="{{ shop.sizeChips }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" style="height:42px;border:none;border-radius:8px;background:{{ c.bg }};color:{{ c.fg }};font:inherit;font-size:14px;font-weight:{{ c.sw }};cursor:pointer">{{ c.label }}</button></sc-for></div></div>
+<div style="display:flex;flex-direction:column;gap:12px;padding-top:22px;border-top:1px solid #ecebe7"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f">Stanje</span><div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ shop.stockList }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" class="td-spill" data-on="{{ c.active }}">{{ c.label }}</button></sc-for></div></div>
+</div>
+<div style="display:flex;align-items:center;gap:12px;padding:14px 20px calc(14px + env(safe-area-inset-bottom));border-top:1px solid #ecebe7">
+<button onClick="{{ sheetReset }}" style="height:48px;padding:0 6px;border:none;background:none;font:inherit;font-size:15px;font-weight:600;color:{{ shop.resetFg }};text-decoration:underline;text-underline-offset:4px;cursor:pointer;white-space:nowrap">Poništi sve</button>
+<button onClick="{{ closeFilters }}" style="flex:1;height:48px;border:none;border-radius:999px;background:#16130f;color:#ffffff;font:inherit;font-size:15px;font-weight:700;cursor:pointer">{{ shop.showLabel }}</button>
+</div>
+</div>
+</sc-if>
+</section>
+</sc-if>
+
+<!-- PDP -->
+<sc-if value="{{ isPdp }}" hint-placeholder-val="{{ false }}">
+<section style="max-width:1120px;margin:0 auto;padding:32px 24px 96px">
+<nav aria-label="Putanja" class="td-pdcrumb" style="font-size:16px;line-height:24px;font-weight:500;color:#63625c;display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 28px"><a href="#" onClick="{{ nav.shop }}" style="color:#63625c;text-decoration:underline;text-underline-offset:4px" style-hover="color:#16130f">Shop</a><span>/</span><a href="#" onClick="{{ pd.openCat }}" style="color:#63625c;text-decoration:underline;text-underline-offset:4px" style-hover="color:#16130f">{{ pd.catLabel }}</a><span>/</span><span style="color:#16130f;font-weight:700">{{ pd.name }}</span></nav>
+<div class="td-pdgrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:48px;align-items:start">
+<div class="td-pdmedia" style="display:flex;flex-direction:column;gap:12px">
+<sc-if value="{{ pd.mainIsCard }}"><div class="td-stage td-lock" onContextMenu="{{ blockMenu }}"><div class="td-stage-shadow"></div><div class="td-stage-shoe"><img src="{{ pd.mainImg }}" alt="{{ pd.name }} – {{ pd.sku }}" draggable="false"></div><sc-if value="{{ pd.imgBadge }}"><span style="position:absolute;top:16px;left:16px;padding:6px 10px;background:{{ pd.badgeBg }};color:{{ pd.badgeFg }};font-size:11px;line-height:14px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">{{ pd.imgBadge }}</span></sc-if></div></sc-if>
+<sc-if value="{{ pd.mainIsDetail }}"><div class="td-lock" onContextMenu="{{ blockMenu }}" style="aspect-ratio:1;background:#f2f2f0;display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="{{ pd.mainImg }}" alt="{{ pd.name }}" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block"></div></sc-if>
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px"><sc-for list="{{ pd.thumbs }}" as="th"><button onClick="{{ th.onClick }}" aria-label="{{ th.label }}" style="aspect-ratio:1;padding:0;background:#f2f2f0;border:1.5px solid {{ th.border }};cursor:pointer;overflow:hidden"><img src="{{ th.src }}" alt="" draggable="false" style="width:100%;height:100%;object-fit:contain;display:block"></button></sc-for></div>
+</div>
+<div class="td-pdinfo" style="display:flex;flex-direction:column;gap:28px;position:sticky;top:96px">
+<div style="display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;justify-content:space-between;align-items:center;gap:12px"><a href="#" onClick="{{ pd.openCat }}" style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c" style-hover="color:#16130f">{{ pd.catLabel }}</a><span class="td-stock td-stock-lg" data-on="{{ pd.stockOn }}"><i aria-hidden="true"></i>{{ pd.stockLabel }}</span></div>
+<h1 class="td-pdtitle" style="margin:0;font-size:{{ t.h2 }}px;line-height:1.1;font-weight:800;letter-spacing:-.03em">{{ pd.name }}</h1>
+<div style="display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:2px"><span class="td-pdprice" style="font-size:26px;line-height:32px;font-weight:700;letter-spacing:-.01em">{{ pd.priceFmt }}</span><sc-if value="{{ pd.compareFmt }}"><s style="font-size:15px;line-height:20px;color:#8a8882">{{ pd.compareFmt }}</s></sc-if><sc-if value="{{ pd.offLabel }}"><span style="padding:4px 8px;border-radius:6px;background:#ffc400;color:#16130f;font-size:12px;line-height:14px;font-weight:800">{{ pd.offLabel }}</span></sc-if></div>
+<sc-if value="{{ pd.shortDescription }}"><p style="margin:4px 0 0;font-size:15px;line-height:23px;color:#484742;max-width:480px">{{ pd.shortDescription }}</p></sc-if>
+</div>
+<div style="display:flex;flex-direction:column;gap:22px;padding-top:22px;border-top:1px solid #ecebe7">
+<div style="display:flex;flex-direction:column;gap:12px"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f">Boja</span><span style="font-size:14px;line-height:20px;font-weight:600;color:#484742">{{ pd.colorLabel }}</span></div><sc-if value="{{ pd.multiColor }}"><div style="display:flex;gap:8px"><sc-for list="{{ pd.colorOpts }}" as="c"><button onClick="{{ c.onClick }}" aria-label="{{ c.label }}" aria-pressed="{{ c.active }}" style="width:36px;height:36px;border-radius:999px;border:2px solid {{ c.ring }};background:{{ c.hex }};box-shadow:inset 0 0 0 3px #ffffff;cursor:pointer"></button></sc-for></div></sc-if></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div style="display:flex;justify-content:space-between;align-items:center"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f">Veličina</span><button onClick="{{ openGuide }}" style="border:none;background:none;padding:0;font:inherit;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px;cursor:pointer;color:#16130f">Pomoć oko veličine</button></div>
+<div class="td-pdsizes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:8px"><sc-for list="{{ pd.sizeOpts }}" as="c"><button onClick="{{ c.onClick }}" aria-pressed="{{ c.active }}" style="height:48px;border:none;border-radius:8px;background:{{ c.bg }};color:{{ c.fg }};font:inherit;font-size:15px;font-weight:{{ c.w }};cursor:pointer;transition:background .15s,color .15s">{{ c.label }}</button></sc-for></div>
+<sc-if value="{{ pd.sizeErr }}"><span role="alert" style="font-size:13px;font-weight:600;color:#c2362f">Prvo izaberi broj, brate</span></sc-if>
+</div>
+<sc-if value="{{ pd.canQty }}"><div style="display:flex;justify-content:space-between;align-items:center;gap:16px"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#16130f">Količina</span><div class="td-qty" role="group" aria-label="Količina"><button onClick="{{ pd.qtyDec }}" aria-label="Manje" data-off="{{ pd.qtyMin }}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span aria-live="polite">{{ pd.qty }}</span><button onClick="{{ pd.qtyInc }}" aria-label="Više" data-off="{{ pd.qtyMax }}"><svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg></button></div></div></sc-if>
+</div>
+<sc-if value="{{ pd.inStock }}" hint-placeholder-val="{{ true }}"><button class="td-tornbtn" onClick="{{ pd.add }}" style="height:56px;border-radius:999px;border:none;background:#e9b52c;color:#16130f;font-size:16px;font-weight:700;cursor:pointer" style-hover="background:#d19a12">Uzimam — {{ pd.totalFmt }}</button></sc-if>
+<sc-if value="{{ pd.noPrice }}"><a class="td-tornbtn" href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" style="height:56px;background:#e9b52c;color:#16130f;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center" style-hover="background:#d19a12">Pitaj za cenu u DM</a></sc-if>
+<sc-if value="{{ pd.outOfStock }}"><div style="height:56px;border-radius:999px;border:1px solid #cfcfca;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;color:#63625c;text-align:center;padding:0 16px">Po porudžbini · pre poručivanja potvrdi dostupnost u DM-u</div></sc-if>
+<div style="border-top:1px solid #e3e3e0">
+<sc-for list="{{ pd.notes }}" as="n"><div class="td-pdnote" style="display:flex;justify-content:space-between;gap:16px;padding:16px 0;border-bottom:1px solid #e3e3e0;font-size:16px;line-height:24px"><span style="font-weight:600">{{ n.k }}</span><span style="color:#484742;text-align:right">{{ n.v }}</span></div></sc-for>
+</div>
+</div>
+</div>
+<div class="td-pdrel" style="padding-top:96px">
+<h2 style="margin:0 0 32px;font-size:{{ t.h2 }}px;line-height:1.2;font-weight:700;letter-spacing:-.02em;text-transform:uppercase">Možda ti legne i ovo</h2>
+<div style="display:grid;grid-template-columns:{{ cardGrid }};gap:{{ cardGap }}">
+<sc-for list="{{ related }}" as="p">
+<div role="button" tabIndex="0" onClick="{{ p.open }}" class="td-card" style="cursor:pointer;display:flex;flex-direction:column;gap:12px;min-width:0">
+<div class="td-stage"><div class="td-stage-shadow"></div><sc-if value="{{ p.cardImg }}"><div class="td-stage-shoe td-lock"><img src="{{ p.cardImg }}" alt="{{ p.name }}" draggable="false" decoding="async"></div></sc-if><sc-if value="{{ p.badge }}"><span class="td-badge" style="position:absolute;top:10px;left:10px;padding:5px 8px;background:{{ p.badgeBg }};color:{{ p.badgeFg }};font-size:10px;line-height:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase">{{ p.badge }}</span></sc-if></div>
+<div class="td-cinfo" style="display:flex;flex-direction:column;gap:2px">
+<span class="td-ccat" style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c">{{ p.catLabel }}</span>
+<span class="td-cname" style="font-size:16px;line-height:22px;font-weight:700">{{ p.name }}</span>
+<div class="td-cprow" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px"><span class="td-cprice" style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap"><span style="font-size:15px;line-height:20px;font-weight:600">{{ p.priceFmt }}</span><sc-if value="{{ p.compareFmt }}"><s style="font-size:12px;line-height:16px;color:#63625c">{{ p.compareFmt }}</s></sc-if></span><span class="td-stock" data-on="{{ p.stockOn }}"><i aria-hidden="true"></i>{{ p.stockLabel }}</span></div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+</sc-if>
+
+<!-- CART -->
+<sc-if value="{{ isCart }}" hint-placeholder-val="{{ false }}">
+<section class="td-msec" style="max-width:1120px;margin:0 auto;padding:48px 24px 96px">
+<button class="td-mback" onClick="{{ goBack }}" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;margin:0 0 24px;padding:8px 0;border:none;background:none;color:#16130f;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="color:#484742"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5 M12 19l-7-7 7-7"/></svg>Nazad</button>
+<div class="td-mh" style="display:flex;align-items:baseline;gap:12px;margin:0 0 32px"><h1 style="margin:0;font-size:{{ t.h3 }}px;line-height:1.05;font-weight:800;letter-spacing:-.03em;text-transform:uppercase">Korpa</h1><span style="font-size:16px;font-weight:600;color:#63625c">{{ cartCountLabel }}</span></div>
+<sc-if value="{{ cartEmptyMobile }}">
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:48px 96px;align-items:center;padding:48px 0 0;border-top:1px solid #16130f">
+<div style="display:flex;flex-direction:column;align-items:flex-start;gap:16px">
+<svg aria-hidden="true" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+<span style="font-size:28px;line-height:34px;font-weight:800;letter-spacing:-.02em">Korpa ti je prazna</span>
+<p style="margin:0;font-size:16px;line-height:24px;color:#484742;max-width:360px">Ajde, nađi svoj par.</p>
+<button class="td-tornbtn" onClick="{{ nav.shop }}" style="margin-top:8px;height:52px;padding:0 32px;border:none;background:#e9b52c;color:#16130f;font-size:16px;font-weight:700;cursor:pointer" style-hover="background:#d19a12">Idemo u Shop</button>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px">
+<span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c">Kupovina u TopDrop-u</span>
+<div style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px;color:#484742"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2 M15 18H9 M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14 M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0"/></svg>Besplatna dostava za porudžbine iznad 17.500 RSD</div><div style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px;color:#484742"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z M10 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M6 12h.01 M18 12h.01"/></svg>Plaćanje pouzećem pri preuzimanju</div><div style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px;color:#484742"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M3 7h14l-3-3 M21 17H7l3 3"/></svg>Zamena veličine u roku od 7 dana</div>
+<div style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px;color:#484742"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.63l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11z M21.85 2.15L10.91 13.09"/></svg><span>Pitanja? Piši nam u DM <a href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" style="color:#16130f;font-weight:700;text-decoration:underline;text-underline-offset:3px">@topdropstore</a></span></div>
+</div>
+</div>
+</sc-if>
+<sc-if value="{{ cartLayout }}">
+<div class="td-cartgrid" style="display:grid;grid-template-columns:{{ cartCols }};gap:48px;align-items:start">
+<div>
+<div style="display:flex;justify-content:space-between;align-items:baseline;padding:0 0 14px;border-bottom:1px solid #16130f"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Tvoji proizvodi</span><sc-if value="{{ cartHas }}"><a href="#" onClick="{{ nav.shop }}" style="font-size:14px;font-weight:600;color:#16130f;text-decoration:underline;text-underline-offset:4px">Nastavi kupovinu</a></sc-if></div>
+<sc-for list="{{ lines }}" as="l">
+<div class="td-cline" style="display:grid;grid-template-columns:{{ cartLineCols }};gap:20px;align-items:start;padding:24px 0;border-bottom:1px solid #e3e3e0">
+<div onClick="{{ l.open }}" class="td-stage td-lock" style="width:100%;min-width:0;cursor:pointer"><div class="td-stage-shadow"></div><sc-if value="{{ l.img }}"><div class="td-stage-shoe"><img src="{{ l.img }}" alt="{{ l.name }}" draggable="false"></div></sc-if></div>
+<div style="display:flex;flex-direction:column;justify-content:space-between;gap:14px;min-width:0;align-self:stretch">
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;align-items:flex-start">
+<div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+<span style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c">{{ l.brand }}</span>
+<a href="#" onClick="{{ l.open }}" style="font-size:17px;line-height:23px;font-weight:700;color:#16130f">{{ l.name }}</a>
+<span style="font-size:14px;line-height:20px;color:#63625c">Veličina {{ l.size }} · {{ l.colorName }}<span class="td-hidem"> · {{ l.sku }}</span></span>
+</div>
+<span style="font-size:17px;line-height:23px;font-weight:800;white-space:nowrap">{{ l.totalFmt }}</span>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:center;gap:16px">
+<div class="td-qty td-qty-sm" role="group" aria-label="Količina"><button onClick="{{ l.dec }}" aria-label="Smanji"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14"/></svg></button><span>{{ l.qty }}</span><button onClick="{{ l.inc }}" aria-label="Povećaj" data-off="{{ l.atMax }}"><svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg></button></div>
+<button onClick="{{ l.remove }}" aria-label="Ukloni {{ l.name }}" style="display:inline-flex;align-items:center;gap:6px;padding:0;border:none;background:none;font:inherit;font-size:13px;font-weight:600;color:#63625c;cursor:pointer" style-hover="color:#16130f"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16 M10 11v6 M14 11v6 M6 7l1 13h10l1-13 M9 7V4h6v3"/></svg>Ukloni</button>
+</div>
+</div>
+</div>
+</sc-for>
+<sc-if value="{{ cartEmpty }}">
+<div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:14px;padding:72px 24px;border-bottom:1px solid #e3e3e0">
+<svg aria-hidden="true" width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg>
+<span style="font-size:24px;line-height:30px;font-weight:800;letter-spacing:-.02em">Korpa ti je prazna</span>
+<p style="margin:0;font-size:15px;line-height:22px;color:#484742">Ajde, nađi svoj par.</p>
+<button class="td-tornbtn" onClick="{{ nav.shop }}" style="margin-top:6px;height:50px;padding:0 30px;border:none;background:#e9b52c;color:#16130f;font-size:15px;font-weight:700;cursor:pointer" style-hover="background:#d19a12">Idemo u Shop</button>
+</div>
+</sc-if>
+</div>
+<aside class="td-sum" style="position:sticky;top:96px;background:#f6f5f2;padding:28px;display:flex;flex-direction:column;gap:16px">
+<span style="font-size:20px;line-height:26px;font-weight:800;letter-spacing:-.01em">Pregled porudžbine</span>
+<div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:13px;line-height:18px;color:#484742">{{ freeMsg }}</span><div style="height:4px;background:#e3e1db"><div style="height:4px;width:{{ freePct }}%;background:#d19a12"></div></div></div>
+<div style="display:flex;flex-direction:column;gap:10px;padding:8px 0 16px;border-bottom:1px solid #dcd9d1">
+<div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#484742">Međuzbir</span><span style="font-weight:600">{{ subtotalFmt }}</span></div>
+<div style="display:flex;justify-content:space-between;gap:16px;font-size:15px"><span style="color:#484742">Dostava</span><span style="font-weight:600;text-align:right">{{ cartShipShown }}</span></div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px"><span style="font-size:16px;font-weight:700;padding-top:4px">Ukupno</span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-size:24px;line-height:30px;font-weight:800;white-space:nowrap">{{ subtotalFmt }}</span><sc-if value="{{ shipExtra }}"><span style="font-size:12px;color:#63625c">+ dostava {{ shipRangeLabel }}</span></sc-if></span></div>
+<sc-if value="{{ cartHas }}"><button class="td-tornbtn" onClick="{{ nav.checkout }}" style="width:100%;height:56px;border:none;background:#e9b52c;color:#16130f;font-size:16px;font-weight:700;cursor:pointer" style-hover="background:#d19a12">Idemo dalje</button></sc-if>
+<sc-if value="{{ cartEmpty }}"><button class="td-tornbtn" disabled aria-disabled="true" style="width:100%;height:56px;border:none;background:#e3e1db;color:#8a887f;font-size:16px;font-weight:700;cursor:not-allowed">Idemo dalje</button></sc-if>
+<div style="display:flex;flex-direction:column;gap:10px;padding-top:4px"><div style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px;color:#484742"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z M10 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M6 12h.01 M18 12h.01"/></svg>Plaćanje pouzećem pri preuzimanju</div><div style="display:flex;gap:10px;align-items:center;font-size:14px;line-height:20px;color:#484742"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M3 7h14l-3-3 M21 17H7l3 3"/></svg>Zamena veličine u roku od 7 dana</div></div>
+</aside>
+</div>
+</sc-if>
+</section>
+</sc-if>
+
+<!-- CHECKOUT -->
+<sc-if value="{{ isCheckout }}" hint-placeholder-val="{{ false }}">
+<section class="td-msec" style="max-width:1120px;margin:0 auto;padding:48px 24px 96px">
+<button class="td-mback" onClick="{{ goBack }}" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;margin:0 0 24px;padding:8px 0;border:none;background:none;color:#16130f;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="color:#484742"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5 M12 19l-7-7 7-7"/></svg>Nazad</button>
+<h1 class="td-mh1" style="margin:0 0 32px;font-size:{{ t.h3 }}px;line-height:1.05;font-weight:800;letter-spacing:-.03em;text-transform:uppercase">Porudžbina</h1>
+<form onSubmit="{{ submitOrder }}" noValidate class="td-coform" style="display:grid;grid-template-columns:{{ coCols }};gap:56px;align-items:start">
+<div class="td-costeps" style="display:flex;flex-direction:column;gap:40px;min-width:0">
+<div><div class="td-step" style="display:flex;align-items:baseline;gap:14px;margin-bottom:20px"><span aria-hidden="true" style="font-size:34px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#c4c2bc;font-variant-numeric:tabular-nums">01</span><h2 style="margin:0;font-size:20px;line-height:28px;font-weight:800;letter-spacing:-.01em">Ko poručuje?</h2></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:16px">
+<div style="display:flex;flex-direction:column;gap:6px"><label class="td-fl" data-err="{{ fe.nameOn }}"><span>Ime i prezime</span><input name="name" required autocomplete="name" placeholder="Marko Marković" onInput="{{ fe.clear }}" class="td-in"></label><sc-if value="{{ fe.nameOn }}"><span role="alert" class="td-ferr">{{ fe.name }}</span></sc-if></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label class="td-fl" data-err="{{ fe.telOn }}"><span>Telefon</span><input name="tel" type="tel" required autocomplete="tel" placeholder="06x xxx xxxx" onInput="{{ fe.clear }}" class="td-in"></label><sc-if value="{{ fe.telOn }}"><span role="alert" class="td-ferr">{{ fe.tel }}</span></sc-if></div>
+</div>
+<div style="margin-top:16px"><div style="display:flex;flex-direction:column;gap:6px"><label class="td-fl" data-err="{{ fe.emailOn }}"><span>E-mail</span><input name="email" type="email" required autocomplete="email" placeholder="ime@primer.rs" onInput="{{ fe.clear }}" class="td-in"></label><sc-if value="{{ fe.emailOn }}"><span role="alert" class="td-ferr">{{ fe.email }}</span></sc-if></div></div>
+</div>
+<div class="td-cosec" style="padding-top:32px;border-top:1px solid #e3e3e0"><div class="td-step" style="display:flex;align-items:baseline;gap:14px;margin-bottom:20px"><span aria-hidden="true" style="font-size:34px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#c4c2bc;font-variant-numeric:tabular-nums">02</span><h2 style="margin:0;font-size:20px;line-height:28px;font-weight:800;letter-spacing:-.01em">Gde šaljemo?</h2></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label class="td-fl" data-err="{{ fe.streetOn }}"><span>Ulica i broj</span><input name="street" required autocomplete="street-address" placeholder="npr. Bulevar oslobođenja 12" onInput="{{ fe.clear }}" class="td-in"></label><sc-if value="{{ fe.streetOn }}"><span role="alert" class="td-ferr">{{ fe.street }}</span></sc-if></div>
+<div class="td-cityzip" style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:16px;margin-top:16px">
+<div style="display:flex;flex-direction:column;gap:6px"><label class="td-fl" data-err="{{ fe.cityOn }}"><span>Grad</span><input name="city" required autocomplete="address-level2" placeholder="Beograd" onInput="{{ fe.clear }}" class="td-in"></label><sc-if value="{{ fe.cityOn }}"><span role="alert" class="td-ferr">{{ fe.city }}</span></sc-if></div>
+<div style="display:flex;flex-direction:column;gap:6px"><label class="td-fl" data-err="{{ fe.zipOn }}"><span>Poštanski broj</span><input name="zip" required inputmode="numeric" autocomplete="postal-code" placeholder="11000" onInput="{{ fe.clear }}" class="td-in"></label><sc-if value="{{ fe.zipOn }}"><span role="alert" class="td-ferr">{{ fe.zip }}</span></sc-if></div>
+</div>
+</div>
+<div class="td-cosec" style="padding-top:32px;border-top:1px solid #e3e3e0"><div class="td-step" style="display:flex;align-items:baseline;gap:14px;margin-bottom:20px"><span aria-hidden="true" style="font-size:34px;line-height:1;font-weight:300;letter-spacing:-.04em;color:#c4c2bc;font-variant-numeric:tabular-nums">03</span><h2 style="margin:0;font-size:20px;line-height:28px;font-weight:800;letter-spacing:-.01em">Kako stiže i kako plaćaš</h2></div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<div class="td-opt" style="display:flex;align-items:center;gap:16px;padding:18px 20px;border:1.5px solid #16130f;border-radius:12px"><span class="td-opticon" style="width:44px;height:44px;flex:none;border-radius:10px;background:#f4f4f2;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2 M15 18H9 M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14 M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0"/></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:16px;line-height:22px;font-weight:700">Kurirska dostava na adresu</span><span style="font-size:13px;line-height:18px;color:#63625c">1–5 radnih dana od slanja · cena zavisi od težine paketa</span></span><span class="td-optprice" style="font-size:15px;font-weight:700;white-space:nowrap">{{ shippingFmt }}</span><span aria-hidden="true" style="width:22px;height:22px;flex:none;border-radius:999px;background:#16130f;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></div>
+<div class="td-opt" style="display:flex;align-items:center;gap:16px;padding:18px 20px;border:1.5px solid #16130f;border-radius:12px"><span class="td-opticon" style="width:44px;height:44px;flex:none;border-radius:10px;background:#f4f4f2;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z M10 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M6 12h.01 M18 12h.01"/></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:16px;line-height:22px;font-weight:700">Plaćanje pouzećem</span><span style="font-size:13px;line-height:18px;color:#63625c">Plaćaš kuriru kad ti donese paket. Nula rizika.</span></span><span aria-hidden="true" style="width:22px;height:22px;flex:none;border-radius:999px;background:#16130f;display:flex;align-items:center;justify-content:center"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span></div>
+</div>
+</div>
+</div>
+<aside class="td-sum" style="position:sticky;top:96px;background:#f6f5f2;padding:32px;display:flex;flex-direction:column;gap:18px">
+<div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:20px;line-height:26px;font-weight:800;letter-spacing:-.01em">Pregled porudžbine</span><span style="font-size:14px;font-weight:600;color:#63625c">{{ cartCountLabel }}</span></div>
+<div style="display:flex;flex-direction:column">
+<sc-for list="{{ lines }}" as="l"><div class="td-sline" style="display:grid;grid-template-columns:96px minmax(0,1fr);gap:18px;align-items:center;padding:16px 0;border-top:1px solid #e6e3dc"><div class="td-stage td-lock" style="width:100%"><div class="td-stage-shadow"></div><sc-if value="{{ l.img }}"><div class="td-stage-shoe"><img src="{{ l.img }}" alt="{{ l.name }}" draggable="false"></div></sc-if></div><div style="display:flex;flex-direction:column;gap:4px;min-width:0"><span style="font-size:11px;line-height:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#8a8882">{{ l.brand }}<span class="td-hidem"> · {{ l.sku }}</span></span><span style="font-size:15px;line-height:21px;font-weight:700">{{ l.name }}</span><div class="td-slrow" style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:4px"><span style="font-size:13px;color:#63625c;white-space:nowrap">Vel. {{ l.size }} · {{ l.qty }} kom</span><span style="font-size:15px;font-weight:800;white-space:nowrap">{{ l.totalFmt }}</span></div></div></div></sc-for>
+</div>
+<sc-if value="{{ cartEmpty }}"><span style="font-size:15px;color:#63625c">Korpa je prazna.</span></sc-if>
+<div style="display:flex;flex-direction:column;gap:10px;padding:16px 0;border-top:1px solid #dcd9d1;border-bottom:1px solid #dcd9d1;margin-top:-16px">
+<div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#484742">Međuzbir</span><span style="font-weight:600">{{ subtotalFmt }}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:15px"><span style="color:#484742">Dostava</span><span style="font-weight:600">{{ shippingFmt }}</span></div>
+</div>
+<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px"><span style="font-size:16px;font-weight:700;padding-top:4px">Ukupno</span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px"><span style="font-size:24px;line-height:30px;font-weight:800;white-space:nowrap">{{ subtotalFmt }}</span><sc-if value="{{ shipExtra }}"><span style="font-size:12px;color:#63625c">+ dostava {{ shipRangeLabel }}</span></sc-if></span></div>
+<button class="td-tornbtn" type="submit" disabled="{{ sending }}" aria-busy="{{ sending }}" style="height:56px;border:none;background:#e9b52c;color:#16130f;font-size:16px;font-weight:700;cursor:pointer;opacity:{{ sendOp }}" style-hover="background:#d19a12">{{ poruciLabel }}</button>
+<sc-if value="{{ sendErr }}"><div role="alert" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:#fdecea;color:#8a1c12;font-size:13px;line-height:19px;font-weight:600"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M12 8v5 M12 16.5h.01"/></svg><span>Porudžbina nije stigla do nas. Proveri internet i probaj ponovo, a ako opet ne ide, piši nam u DM na @topdropstore.</span></div></sc-if>
+<sc-if value="{{ fe.any }}"><div role="alert" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:#fdecea;color:#8a1c12;font-size:13px;line-height:19px;font-weight:600"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M12 8v5 M12 16.5h.01"/></svg><span>{{ fe.summary }}</span></div></sc-if>
+<span style="font-size:12px;line-height:17px;color:#63625c;text-align:center">Plaćanje pouzećem, pri preuzimanju.</span>
+</aside>
+</form>
+</section>
+</sc-if>
+
+<!-- SUCCESS -->
+<sc-if value="{{ isSuccess }}" hint-placeholder-val="{{ false }}">
+<section style="max-width:640px;margin:0 auto;padding:88px 24px 112px;text-align:center;display:flex;flex-direction:column;align-items:center">
+<div class="td-stamp" style="margin-bottom:36px"><div class="td-tornbtn" style="display:inline-flex;align-items:center;gap:12px;padding:16px 30px 16px 26px;background:#ffc400;color:#16130f"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path class="td-check" d="M5 12.5l4.5 4.5L19 7.5"/></svg><span style="font-size:26px;line-height:1;font-weight:800;letter-spacing:.02em;text-transform:uppercase">Poručeno</span></div></div>
+<h1 style="margin:0;font-size:{{ t.h3 }}px;line-height:1.05;font-weight:800;letter-spacing:-.03em">To je to! Porudžbina je kod nas.</h1>
+<p style="margin:14px 0 0;max-width:420px;font-size:17px;line-height:26px;color:#484742">Pripremamo paket, a ti samo budi tu kad kurir pozvoni.</p>
+<sc-if value="{{ orderId }}"><span style="margin-top:22px;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;background:#f4f4f2;font-size:13px;color:#63625c">Broj porudžbine <b style="color:#16130f;letter-spacing:.04em">{{ orderId }}</b></span></sc-if>
+<div style="display:flex;align-items:flex-start;width:100%;max-width:480px;margin:44px 0 0">
+<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><span style="width:28px;height:28px;border-radius:999px;background:#16130f;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span style="font-size:14px;font-weight:700;color:#16130f">Primljena</span><span style="font-size:12px;color:#8a8882">upravo sada</span></div><span aria-hidden="true" style="flex:0 0 40px;height:1.5px;background:#dcdad5;margin-top:14px"></span><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><span style="width:28px;height:28px;border-radius:999px;border:1.5px solid #cfcdc7;color:#8a8882;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span><span style="font-size:14px;font-weight:700;color:#484742">Slanje</span><span style="font-size:12px;color:#8a8882">pripremamo paket</span></div><span aria-hidden="true" style="flex:0 0 40px;height:1.5px;background:#dcdad5;margin-top:14px"></span><div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center"><span style="width:28px;height:28px;border-radius:999px;border:1.5px solid #cfcdc7;color:#8a8882;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span><span style="font-size:14px;font-weight:700;color:#484742">Dostava</span><span style="font-size:12px;color:#8a8882">1–5 radnih dana</span></div>
+</div>
+<div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:16px 24px;margin-top:48px">
+<button class="td-tornbtn" onClick="{{ nav.shop }}" style="height:52px;padding:0 32px;border:none;background:#e9b52c;color:#16130f;font-size:16px;font-weight:700;cursor:pointer" style-hover="background:#d19a12">Nastavi kupovinu</button>
+<a href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" style="font-size:15px;font-weight:600;color:#16130f">Pitanja? <span style="text-decoration:underline;text-underline-offset:4px">@topdropstore</span></a>
+</div>
+</section>
+</sc-if>
+
+<!-- CONTACT -->
+<sc-if value="{{ isContact }}" hint-placeholder-val="{{ false }}">
+<section class="td-msec" style="max-width:1120px;margin:0 auto;padding:48px 24px 96px">
+<button class="td-mback" onClick="{{ goBack }}" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;margin:0 0 24px;padding:8px 0;border:none;background:none;color:#16130f;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="color:#484742"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5 M12 19l-7-7 7-7"/></svg>Nazad</button>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:56px 96px;align-items:start">
+<div style="display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<h1 style="margin:0;font-size:{{ t.h3 }}px;line-height:1.05;font-weight:800;letter-spacing:-.03em;text-transform:uppercase">Piši nam</h1>
+<p style="margin:0;font-size:16px;line-height:24px;color:#484742;max-width:380px">Broj, model, dostava, bilo šta. Pitaj slobodno, tu smo.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:24px">
+<sc-for list="{{ contactDetails }}" as="c">
+<div style="display:flex;gap:16px;align-items:flex-start">
+<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="{{ c.d }}"/></svg>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c">{{ c.k }}</span><span style="font-size:15px;line-height:22px;font-weight:600">{{ c.v }}</span></div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;padding-top:{{ contactFormTop }}px">
+<span style="font-size:12px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#63625c;padding-bottom:12px;border-bottom:1px solid #16130f">Izaberi kako ti je lakše</span>
+<a href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" class="td-crow" style="display:flex;align-items:center;gap:18px;padding:22px 4px;border-bottom:1px solid #e3e3e0;color:#16130f;text-decoration:none;cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;font:inherit;text-align:left;width:100%"><span style="flex:none;width:48px;height:48px;border-radius:999px;background:#f4f4f2;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4z M8 12a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M17.5 6.5h.01"/></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:18px;line-height:24px;font-weight:700">Instagram DM</span><span style="font-size:14px;line-height:20px;color:#63625c">@topdropstore · najbrži odgovor</span></span><svg class="td-carr" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></a>
+<sc-if value="{{ mailOn }}"><a href="{{ mailHref }}" class="td-crow" style="display:flex;align-items:center;gap:18px;padding:22px 4px;border-bottom:1px solid #e3e3e0;color:#16130f;text-decoration:none;cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;font:inherit;text-align:left;width:100%"><span style="flex:none;width:48px;height:48px;border-radius:999px;background:#f4f4f2;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z M3.5 6.5L12 13l8.5-6.5"/></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:18px;line-height:24px;font-weight:700">E-mail</span><span style="font-size:14px;line-height:20px;color:#63625c">{{ mailAddr }}</span></span><svg class="td-carr" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></a></sc-if>
+<a href="#" onClick="{{ nav.shop }}" class="td-crow" style="display:flex;align-items:center;gap:18px;padding:22px 4px;border-bottom:1px solid #e3e3e0;color:#16130f;text-decoration:none;cursor:pointer;background:none;border-left:none;border-right:none;border-top:none;font:inherit;text-align:left;width:100%"><span style="flex:none;width:48px;height:48px;border-radius:999px;background:#ffc400;display:flex;align-items:center;justify-content:center"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z M9 8V6.5a3 3 0 0 1 6 0V8"/></svg></span><span style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0"><span style="font-size:18px;line-height:24px;font-weight:700">Poruči u Shop-u</span><span style="font-size:14px;line-height:20px;color:#63625c">Izaberi model i veličinu, plaćaš pouzećem</span></span><svg class="td-carr" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#16130f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14 M13 6l6 6-6 6"/></svg></a>
+</div>
+</div>
+</section>
+</sc-if>
+
+<!-- FAQ -->
+<sc-if value="{{ isFaq }}" hint-placeholder-val="{{ false }}">
+<div style="background:#f4f4f2">
+<section class="td-msec" style="max-width:1120px;margin:0 auto;padding:48px 24px 112px">
+<button class="td-mback" onClick="{{ goBack }}" style="display:inline-flex;align-items:center;gap:8px;margin:0 0 32px;padding:8px 0;border:none;background:none;color:#16130f;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="color:#484742"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5 M12 19l-7-7 7-7"/></svg>Nazad</button>
+<div class="td-faqgrid" style="display:grid;grid-template-columns:{{ faqCols }};gap:48px 72px;align-items:stretch">
+<div style="display:flex;flex-direction:column;gap:24px">
+<h1 class="td-faqh" style="margin:0;font-size:{{ faqTitle }}px;line-height:1.08;font-weight:700;letter-spacing:-.035em;max-width:440px">Pitanja koja nam stalno stižu</h1>
+<div style="display:flex;flex-direction:column;align-items:flex-start;gap:20px;max-width:360px">
+<p style="margin:0;font-size:15px;line-height:22px;color:#484742">Broj, model, dostava, bilo šta. Pitaj slobodno, tu smo.</p>
+<button onClick="{{ nav.contact }}" style="height:44px;padding:0 20px;border:none;border-radius:999px;background:#16130f;color:#ffffff;font:inherit;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 8px 20px rgba(22,19,15,.18)" style-hover="background:#2c2823">Kontaktiraj nas</button>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ faqItems }}" as="q">
+<div style="background:#ffffff;border-radius:12px">
+<button class="td-faqq" onClick="{{ q.toggle }}" aria-expanded="{{ q.open }}" style="width:100%;display:flex;justify-content:space-between;align-items:center;gap:24px;padding:22px 24px;border:none;background:none;border-radius:12px;text-align:left;cursor:pointer;color:#16130f;font:inherit"><span style="font-size:17px;line-height:24px;font-weight:600">{{ q.q }}</span><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" style="flex:none"><circle cx="12" cy="12" r="10"/><path d="M7.5 12h9"/><path class="td-faq-v" d="M12 7.5v9" style="transform:{{ q.rot }}"/></svg></button>
+<div class="td-faq-a" aria-hidden="{{ q.closed }}" style="grid-template-rows:{{ q.rows }}"><div style="overflow:hidden;min-height:0"><p class="td-faq-p" style="margin:0;padding:0 {{ faqAnsPad }}px 24px 24px;font-size:15px;line-height:23px;color:#484742;opacity:{{ q.op }};transform:translateY({{ q.ty }})">{{ q.a }}</p></div></div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+</div>
+</sc-if>
+
+<!-- BLOG -->
+<sc-if value="{{ isBlog }}" hint-placeholder-val="{{ false }}">
+<section style="max-width:1120px;margin:0 auto;padding:48px 24px 96px">
+<h1 style="margin:0 0 48px;font-size:{{ t.h1 }}px;line-height:1;font-weight:800;letter-spacing:-.04em;text-transform:uppercase">Žurnal</h1>
+<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:32px">
+<sc-for list="{{ posts }}" as="b"><a href="#" onClick="{{ b.open }}" style="display:flex;flex-direction:column;gap:16px"><div style="aspect-ratio:4/3;background:#f2f2f0;display:flex;align-items:center;justify-content:center;font-family:Manrope,system-ui,sans-serif;font-size:12px;color:#63625c">naslovna fotografija</div><span style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#63625c">{{ b.date }} · {{ b.topic }}</span><span style="font-size:24px;line-height:32px;font-weight:700;letter-spacing:-.01em">{{ b.title }}</span><span style="font-size:16px;line-height:24px;color:#484742">{{ b.excerpt }}</span></a></sc-for>
+</div>
+</section>
+</sc-if>
+
+<!-- TEXT PAGE (article / legal) -->
+<sc-if value="{{ isText }}" hint-placeholder-val="{{ false }}">
+<article style="max-width:800px;margin:0 auto;padding:48px 24px 96px;display:flex;flex-direction:column;gap:24px">
+<button onClick="{{ goBack }}" style="display:inline-flex;align-items:center;gap:8px;align-self:flex-start;margin:0;padding:8px 0;border:none;background:none;color:#16130f;font:inherit;font-size:15px;font-weight:600;cursor:pointer" style-hover="color:#484742"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5 M12 19l-7-7 7-7"/></svg>Nazad</button>
+<span style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase">{{ textPage.eyebrow }}</span>
+<h1 style="margin:0;font-size:{{ t.h2 }}px;line-height:1.1;font-weight:800;letter-spacing:-.03em">{{ textPage.title }}</h1>
+<sc-if value="{{ textPage.image }}"><div style="aspect-ratio:16/9;background:#f2f2f0;display:flex;align-items:center;justify-content:center;font-family:Manrope,system-ui,sans-serif;font-size:12px;color:#63625c">fotografija članka</div></sc-if>
+<sc-for list="{{ textPage.paras }}" as="pp"><p style="margin:0;font-size:16px;line-height:28px;color:#2b2a27;text-wrap:pretty">{{ pp.t }}</p></sc-for>
+</article>
+</sc-if>
+</main>
+
+<span id="td-pthumb" aria-hidden="true"></span>
+<footer style="background:#ffffff;padding:16px 24px 24px">
+<div style="position:relative;max-width:1120px;margin:0 auto;background:#16130f;color:#ffffff;border-radius:16px;padding:16px 24px 24px;overflow:hidden;display:flex;flex-direction:column;gap:16px">
+<div class="td-tapes" aria-hidden="true"><div class="td-tape td-tape--black"><div class="td-track2"><span class="td-item">Uhvati trend<i>✦</i></span><span class="td-item">Istakni stil<i>✦</i></span><span class="td-item">Uštedi<i>✦</i></span><span class="td-item">Nike<i>✦</i></span><span class="td-item">Adidas<i>✦</i></span><span class="td-item">New Balance<i>✦</i></span><span class="td-item">Odgovaramo brzo<i>✦</i></span><span class="td-item">Uhvati trend<i>✦</i></span><span class="td-item">Istakni stil<i>✦</i></span><span class="td-item">Uštedi<i>✦</i></span><span class="td-item">Nike<i>✦</i></span><span class="td-item">Adidas<i>✦</i></span><span class="td-item">New Balance<i>✦</i></span><span class="td-item">Odgovaramo brzo<i>✦</i></span><span class="td-item">Uhvati trend<i>✦</i></span><span class="td-item">Istakni stil<i>✦</i></span><span class="td-item">Uštedi<i>✦</i></span><span class="td-item">Nike<i>✦</i></span><span class="td-item">Adidas<i>✦</i></span><span class="td-item">New Balance<i>✦</i></span><span class="td-item">Odgovaramo brzo<i>✦</i></span><span class="td-item">Uhvati trend<i>✦</i></span><span class="td-item">Istakni stil<i>✦</i></span><span class="td-item">Uštedi<i>✦</i></span><span class="td-item">Nike<i>✦</i></span><span class="td-item">Adidas<i>✦</i></span><span class="td-item">New Balance<i>✦</i></span><span class="td-item">Odgovaramo brzo<i>✦</i></span><span class="td-item">Uhvati trend<i>✦</i></span><span class="td-item">Istakni stil<i>✦</i></span><span class="td-item">Uštedi<i>✦</i></span><span class="td-item">Nike<i>✦</i></span><span class="td-item">Adidas<i>✦</i></span><span class="td-item">New Balance<i>✦</i></span><span class="td-item">Odgovaramo brzo<i>✦</i></span><span class="td-item">Uhvati trend<i>✦</i></span><span class="td-item">Istakni stil<i>✦</i></span><span class="td-item">Uštedi<i>✦</i></span><span class="td-item">Nike<i>✦</i></span><span class="td-item">Adidas<i>✦</i></span><span class="td-item">New Balance<i>✦</i></span><span class="td-item">Odgovaramo brzo<i>✦</i></span></div></div><div class="td-tape td-tape--gold"><div class="td-track2"><span class="td-item">Pravi stil<i>✦</i></span><span class="td-item">Pravi izbor<i>✦</i></span><span class="td-item">Dostava na području Srbije<i>✦</i></span><span class="td-item">Plaćanje pouzećem<i>✦</i></span><span class="td-item">100% sigurna kupovina<i>✦</i></span><span class="td-item">@topdropstore<i>✦</i></span><span class="td-item">Pravi stil<i>✦</i></span><span class="td-item">Pravi izbor<i>✦</i></span><span class="td-item">Dostava na području Srbije<i>✦</i></span><span class="td-item">Plaćanje pouzećem<i>✦</i></span><span class="td-item">100% sigurna kupovina<i>✦</i></span><span class="td-item">@topdropstore<i>✦</i></span><span class="td-item">Pravi stil<i>✦</i></span><span class="td-item">Pravi izbor<i>✦</i></span><span class="td-item">Dostava na području Srbije<i>✦</i></span><span class="td-item">Plaćanje pouzećem<i>✦</i></span><span class="td-item">100% sigurna kupovina<i>✦</i></span><span class="td-item">@topdropstore<i>✦</i></span><span class="td-item">Pravi stil<i>✦</i></span><span class="td-item">Pravi izbor<i>✦</i></span><span class="td-item">Dostava na području Srbije<i>✦</i></span><span class="td-item">Plaćanje pouzećem<i>✦</i></span><span class="td-item">100% sigurna kupovina<i>✦</i></span><span class="td-item">@topdropstore<i>✦</i></span><span class="td-item">Pravi stil<i>✦</i></span><span class="td-item">Pravi izbor<i>✦</i></span><span class="td-item">Dostava na području Srbije<i>✦</i></span><span class="td-item">Plaćanje pouzećem<i>✦</i></span><span class="td-item">100% sigurna kupovina<i>✦</i></span><span class="td-item">@topdropstore<i>✦</i></span><span class="td-item">Pravi stil<i>✦</i></span><span class="td-item">Pravi izbor<i>✦</i></span><span class="td-item">Dostava na području Srbije<i>✦</i></span><span class="td-item">Plaćanje pouzećem<i>✦</i></span><span class="td-item">100% sigurna kupovina<i>✦</i></span><span class="td-item">@topdropstore<i>✦</i></span></div></div></div>
+<div aria-hidden="true" style="position:relative;z-index:1;font-size:{{ t.display }}px;display:inline-flex;flex-direction:column;align-items:center;align-self:flex-start;gap:.04em;padding-top:.12em;margin-left:-.03em"><span style="line-height:.78;letter-spacing:-.02em;white-space:nowrap;text-transform:uppercase"><b style="font-weight:800">Top</b><span style="font-weight:300">Drop</span></span><span style="width:1em;height:.06em;border-radius:.03em;background:#ffc400"></span></div>
+<div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:32px;min-height:{{ footMidH }}px;padding:16px 0">
+<div style="align-self:center;padding-left:8px;display:flex;flex-direction:column;gap:20px">
+<p style="margin:0;font-size:14px;line-height:20px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#ffffff">Pravi par nije samo obuća,<br>to je deo tvog identiteta.</p>
+<div style="display:flex;gap:12px">
+<a href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" aria-label="Instagram @topdropstore" title="Instagram @topdropstore" style="width:48px;height:48px;border-radius:999px;border:1.5px solid #e9b52c;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(233,181,44,.12)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e9b52c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="#e9b52c" stroke="none"/></svg></a>
+<a href="mailto:offtopic059@gmail.com" aria-label="Pošalji mejl: offtopic059@gmail.com" title="offtopic059@gmail.com" style="width:48px;height:48px;border-radius:999px;border:1.5px solid #e9b52c;display:flex;align-items:center;justify-content:center" style-hover="background:rgba(233,181,44,.12)"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e9b52c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></svg></a>
+</div>
+</div>
+</div>
+<div style="position:relative;z-index:1;background:#ffffff;color:#16130f;border-radius:999px;padding:8px 20px;min-height:44px;display:flex;flex-wrap:wrap;justify-content:center;text-align:center;align-items:center;gap:12px;font-size:12px;line-height:16px;font-weight:700;letter-spacing:.01em;text-transform:uppercase">
+<span style="font-weight:400">© 2026 TopDrop</span>
+</div>
+<sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+<div class="td-lock" onContextMenu="{{ blockMenu }}" style="position:absolute;z-index:2;left:50%;transform:translateX(-50%);bottom:14px;width:min(660px,58%);height:460px;display:flex;align-items:flex-end;justify-content:center;pointer-events:none"><img src="assets/footer-kesa-patike.webp" alt="TopDrop kesa sa patikama" draggable="false" style="max-width:100%;max-height:100%;display:block;user-select:none;-webkit-user-drag:none"></div>
+</sc-if>
+</div>
+</footer>
+
+<sc-if value="{{ guideOpen }}" hint-placeholder-val="{{ false }}">
+<div onClick="{{ closeGuide }}" style="position:fixed;inset:0;background:rgba(22,19,15,.48);z-index:60;display:flex;align-items:center;justify-content:center;padding:24px">
+<div role="dialog" aria-modal="true" aria-label="Pomoć oko veličine" onClick="{{ stop }}" style="background:#ffffff;max-width:640px;width:100%;padding:32px;display:flex;flex-direction:column;gap:24px">
+<div style="display:flex;justify-content:space-between;align-items:center"><h2 style="margin:0;font-size:24px;line-height:32px;font-weight:800">Pomoć oko veličine</h2><button onClick="{{ closeGuide }}" aria-label="Zatvori" style="width:40px;height:40px;border-radius:999px;border:1px solid #16130f;background:none;font-size:16px;cursor:pointer">✕</button></div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);font-size:16px;line-height:24px">
+<sc-for list="{{ guideRows }}" as="r"><span style="padding:8px 0;border-bottom:1px solid #e3e3e0;font-weight:{{ r.w }}">{{ r.a }}</span><span style="padding:8px 0;border-bottom:1px solid #e3e3e0;font-weight:{{ r.w }}">{{ r.b }}</span><span style="padding:8px 0;border-bottom:1px solid #e3e3e0;font-weight:{{ r.w }}">{{ r.c }}</span><span style="padding:8px 0;border-bottom:1px solid #e3e3e0;font-weight:{{ r.w }}">{{ r.d }}</span></sc-for>
+</div>
+<span style="font-size:16px;line-height:24px;color:#484742">Dostupnost veličina prikazana je pored svakog modela i zavisi od njega. Ako nisi siguran koju veličinu da izabereš, pošalji nam dužinu stopala u centimetrima putem Instagram DM-a (<a href="https://www.instagram.com/topdropstore/" target="_blank" rel="noopener noreferrer" style="color:inherit;font-weight:700;text-decoration:underline;text-underline-offset:3px">@topdropstore</a>). Rado ćemo ti pomoći pri izboru odgovarajuće veličine.</span>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div role="status" style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:70;background:#16130f;color:#ffffff;padding:12px 16px 12px 24px;border-radius:999px;display:flex;align-items:center;gap:16px;font-size:16px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.16);max-width:calc(100% - 32px)"><span>{{ toast }}</span><button onClick="{{ nav.cart }}" style="height:32px;padding:0 12px;border-radius:999px;border:none;background:#e9b52c;color:#16130f;font-size:12px;font-weight:700;cursor:pointer">Korpa</button></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showAnnouncement&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;shopColumns&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;2&quot;,&quot;3&quot;,&quot;4&quot;],&quot;default&quot;:&quot;4&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const CATS=[['jordan','Jordan'],['nike','Nike'],['adidas','Adidas'],['balenciaga','Balenciaga'],['versace','Versace'],['lacoste','Lacoste'],['premiata','Premiata'],['louisvuitton','Louis Vuitton'],['newbalance','New Balance']].map(([id,label])=>({id,label}));
+const COLORS={crna:['Crna','#161615'],bela:['Bela','#f2f1ec'],siva:['Siva','#9b9a95'],bez:['Bež','#d9d0c1'],braon:['Braon','#7a5a48'],zelena:['Zelena','#4f6b57'],maslinasta:['Maslinasta','#6c6b52'],plava:['Plava','#2f5d9e'],crvena:['Crvena','#b8322a'],zuta:['Žuta','#e9b52c'],zlatna:['Zlatna','#c4a265'],roze:['Roze','#e7b8c0'],ljubicasta:['Ljubičasta','#b04fd6']};
+const EU=n=>Array.from({length:n[1]-n[0]+1},(_,i)=>String(n[0]+i));
+// Brand logos for the Brendovi tiles: [file, width inside the tile].
+const BRAND_LOGOS={nike:['assets/brands/nike.webp','44%'],adidas:['assets/brands/adidas.webp','30%'],premiata:['assets/brands/premiata.webp','40%']};
+// New Balance logo (assets/brands/newbalance.webp) vraćamo kad stignu NB patike.
+// ============================================================
+// KATALOG PROIZVODA — svaki proizvod je jedan objekat u listi.
+// Slike (samo .webp) idu u: assets/proizvodi/<slug>/1.webp, 2.webp, 3.webp…
+//   1.webp = slika za karticu: patika bočno, bez pozadine (providna), isečena tesno oko patike.
+//   2.webp, 3.webp… = dodatne slike za stranicu proizvoda.
+// slug se pravi sam iz naziva (npr. "Air Force 1 '07" -> "air-force-1-07"), ili ga upiši ručno.
+// Polja:
+//   sifra     – šifra proizvoda, npr. 'TD-JD-006' (TD-oznaka brenda-redni broj)
+//   naziv     – naziv modela                    brend   – 'jordan' | 'nike' | 'adidas' | 'balenciaga' | 'versace' | 'lacoste' | 'premiata' | 'louisvuitton' | 'newbalance'
+//   cena      – cena u RSD (broj) ili null = „Cena uskoro“ (ne može u korpu)               staraCena – stara cena za popust ili null
+//   boje      – ključevi iz COLORS, npr. ['bela']
+//   velicine  – dostupne veličine, npr. ['40','41','42']
+//   slike     – koliko slika ima u folderu (1–6)
+//   naStanju  – true = na stanju, false = po porudžbini
+//   limited   – true za limited model            istaknuto – true = prikaži u "Najpopularnije"
+//   opis      – kratak opis (opciono)
+// Primer:
+// {naziv:'Air Force 1 \'07',brend:'nike',cena:12990,staraCena:null,boje:['bela'],velicine:['40','41','42','43'],slike:3,naStanju:true,limited:false,istaknuto:true,opis:''},
+// ============================================================
+const KATALOG=[
+{sifra:'TD-JD-001',naziv:'Air Jordan 4 Retro „Military Black“',slug:'air-jordan-4-military-black',brend:'jordan',cena:12900,staraCena:15200,boje:['bela'],velicine:['36','38','39','40'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-JD-002',naziv:'Air Jordan 4 Retro „White Cement“',slug:'air-jordan-4-white-cement',brend:'jordan',cena:12900,staraCena:15200,boje:['bela'],velicine:['40'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-JD-003',naziv:'Air Jordan 4 Retro „Braon/Crna“',slug:'air-jordan-4-braon-crna',brend:'jordan',cena:12900,staraCena:15200,boje:['braon'],velicine:['36','37','38','39','40','41'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-JD-004',naziv:'Air Jordan 4 Retro „Black Cat“',slug:'air-jordan-4-black-cat',brend:'jordan',cena:12900,staraCena:15200,boje:['crna'],velicine:['36','38','39'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-JD-005',naziv:'Air Jordan 4 Retro „Hyper Violet“',slug:'air-jordan-4-hyper-violet',brend:'jordan',cena:12900,staraCena:15200,boje:['ljubicasta'],velicine:['40'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-NK-001',naziv:'Nike Shox TL „Crna/Ljubičasta“',slug:'nike-shox-tl-crna-ljubicasta',brend:'nike',cena:12900,staraCena:15200,boje:['ljubicasta'],velicine:['36','37'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-NK-002',naziv:'Nike Shox TL „Bež/Ljubičasta“',slug:'nike-shox-tl-bez-ljubicasta',brend:'nike',cena:12900,staraCena:15200,boje:['bez'],velicine:['36','37','38','40','41'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-NK-003',naziv:'Nike Shox TL „Triple Black“',slug:'nike-shox-tl-triple-black',brend:'nike',cena:12900,staraCena:15200,boje:['crna'],velicine:['36','37','38','39','40','41'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-AD-001',naziv:'Adidas Gazelle Bold „Bela/Zelena“',slug:'adidas-gazelle-bold-bela-zelena',brend:'adidas',cena:null,staraCena:null,boje:['bela'],velicine:['36'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-AD-002',naziv:'Adidas Gazelle Bold „Bež/Bela“',slug:'adidas-gazelle-bold-bez-bela',brend:'adidas',cena:null,staraCena:null,boje:['bez'],velicine:['36','37','40'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-BL-001',naziv:'Balenciaga Track „Crna“',slug:'balenciaga-track-crna',brend:'balenciaga',cena:15300,staraCena:17500,boje:['crna'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-BL-002',naziv:'Balenciaga Triple S „Crna“',slug:'balenciaga-triple-s-crna',brend:'balenciaga',cena:15300,staraCena:17500,boje:['crna'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-VS-001',naziv:'Versace Chain Reaction „Crna/Bela“',slug:'versace-chain-reaction-crna-bela',brend:'versace',cena:15300,staraCena:17500,boje:['bela'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-VS-002',naziv:'Versace Chain Reaction „Bela/Crvena“',slug:'versace-chain-reaction-bela-crvena',brend:'versace',cena:15300,staraCena:17500,boje:['bela','crvena'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-VS-003',naziv:'Versace Chain Reaction „Triple Black“',slug:'versace-chain-reaction-triple-black',brend:'versace',cena:15300,staraCena:17500,boje:['crna'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-LC-001',naziv:'Lacoste Elite Active „Maslinasta“',slug:'lacoste-elite-active-maslinasta',brend:'lacoste',cena:12900,staraCena:null,boje:['maslinasta'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-LC-002',naziv:'Lacoste Elite Active „Zelena“',slug:'lacoste-elite-active-zelena',brend:'lacoste',cena:12900,staraCena:null,boje:['zelena'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-LC-003',naziv:'Lacoste Elite Active „Crna/Roze“',slug:'lacoste-elite-active-crna-roze',brend:'lacoste',cena:12900,staraCena:null,boje:['roze'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-LC-004',naziv:'Lacoste Elite Active „Crna/Plava“',slug:'lacoste-elite-active-crna-plava',brend:'lacoste',cena:12900,staraCena:null,boje:['plava'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-LC-005',naziv:'Lacoste Elite Active „Triple Black“',slug:'lacoste-elite-active-triple-black',brend:'lacoste',cena:12900,staraCena:null,boje:['crna'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-PR-001',naziv:'Premiata Mick „Braon/Siva“',slug:'premiata-mick-braon-siva',brend:'premiata',cena:15300,staraCena:17500,boje:['braon'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-PR-002',naziv:'Premiata Mick „Crna“',slug:'premiata-mick-crna',brend:'premiata',cena:15300,staraCena:17500,boje:['crna'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-PR-003',naziv:'Premiata Mick „Crna/Bež“',slug:'premiata-mick-crna-bez',brend:'premiata',cena:15300,staraCena:17500,boje:['bez'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:false,istaknuto:true,opis:''},
+{sifra:'TD-LV-001',naziv:'Louis Vuitton Trainer „Zelena“',slug:'louis-vuitton-trainer-zelena',brend:'louisvuitton',cena:15300,staraCena:17500,boje:['zelena'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-LV-002',naziv:'Louis Vuitton Trainer „Plava Monogram“',slug:'louis-vuitton-trainer-plava-monogram',brend:'louisvuitton',cena:15300,staraCena:17500,boje:['plava'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-LV-003',naziv:'Louis Vuitton Trainer „Crna Monogram“',slug:'louis-vuitton-trainer-crna-monogram',brend:'louisvuitton',cena:15300,staraCena:17500,boje:['crna'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-LV-004',naziv:'Louis Vuitton Trainer „Crvena“',slug:'louis-vuitton-trainer-crvena',brend:'louisvuitton',cena:15300,staraCena:17500,boje:['crvena'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+{sifra:'TD-LV-005',naziv:'Louis Vuitton Trainer „Damier Braon“',slug:'louis-vuitton-trainer-damier-braon',brend:'louisvuitton',cena:15300,staraCena:17500,boje:['braon'],velicine:['36','37','38','39','40','41','42','43','44','45'],slike:1,naStanju:true,limited:true,istaknuto:false,opis:''},
+];
+const slugify=n=>n.toLowerCase().replace(/[čć]/g,'c').replace(/š/g,'s').replace(/ž/g,'z').replace(/đ/g,'dj').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const PRODUCTS=KATALOG.map((k,i)=>{const slug=k.slug||slugify(k.naziv);const n=Math.max(1,k.slike||1);const images=Array.from({length:n},(_,j)=>`assets/proizvodi/${slug}/${j+1}.webp`);return{cardThumb:`assets/proizvodi/${slug}/kartica.webp`,id:'p'+(i+1),sku:k.sifra||('TD-'+String(i+1).padStart(3,'0')),slug,name:k.naziv,shortDescription:k.opis||'',priceRSD:k.cena,compareAtPrice:k.staraCena||null,category:k.brend,images,cardImage:`assets/proizvodi/${slug}/kartica.webp`,colors:(k.boje&&k.boje.length?k.boje:['crna']).filter(c=>COLORS[c]),sizes:(k.velicine||[]).map(String),inStock:k.naStanju!==false,madeToOrder:k.naStanju===false,isLimited:!!k.limited,featured:!!k.istaknuto};});
+// Shop se sam uključi čim u KATALOG dodaš prvi proizvod.
+const SHOW_PRODUCTS=PRODUCTS.length>0;
+const EMPTY_P={slug:'',name:'',category:'nike',priceRSD:0,compareAtPrice:null,images:[],cardImage:'',colors:['crna'],sizes:[],inStock:true,madeToOrder:false,isLimited:false,featured:false,shortDescription:''};
+const IG='https://www.instagram.com/topdropstore/';
+const EMAIL='offtopic059@gmail.com';
+// ===== MAKE / MAIL =====
+// Link za Make webhook (porudžbine idu ovde). Prazno = sajt radi bez slanja.
+const MAKE_WEBHOOK='https://hook.eu1.make.com/0e375tu4m211360966u8vvh9xgssui4y';
+const IG_URL='https://www.instagram.com/topdropstore/';
+const tdAbs=p=>{try{return new URL(p,document.baseURI).href;}catch(e){return p;}};
+const tdEsc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const tdMoney=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' RSD';
+// Gradi oba maila. Broj porudžbine je oznaka __BROJ__ koju Make zameni pravim brojem.
+function tdBuildMails(o){
+  const F="font-family:'Manrope',Helvetica,Arial,sans-serif;";
+  const C='#16130f',G='#63625c',L='#ebe9e4',Y='#ffc400';
+  const head=(file,tag)=>`<tr><td style="background:${C};background-image:linear-gradient(${C},${C});border-radius:14px 14px 0 0;line-height:0;font-size:0"><img src="${tdAbs('assets/mail/'+file)}" width="600" alt="TOPDROP · ${tag}" style="display:block;border:0;width:100%;max-width:600px;height:auto;border-radius:14px 14px 0 0"></td></tr>`;
+  const item=(l)=>`<tr><td style="padding:14px 0;border-top:1px solid ${L}"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+<td width="104" valign="top" style="width:104px"><img src="${l.img}" width="104" height="78" alt="${tdEsc(l.name)}" style="display:block;border:0;width:104px;height:78px;border-radius:8px;background:#f4f3f0"></td>
+<td valign="top" style="padding-left:14px;${F}">
+<div style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${G}">${tdEsc(l.brand)}</div>
+<div style="font-size:15px;line-height:21px;font-weight:700;color:${C}">${tdEsc(l.name)}</div>
+<div style="font-size:13px;line-height:19px;color:${G};padding-top:2px">Veličina ${tdEsc(l.size)} · ${tdEsc(l.color)} · ${l.qty} kom</div>
+${l.admin?`<div style="font-size:12px;line-height:18px;color:${G}">Šifra: <b style="color:${C}">${tdEsc(l.sku)}</b></div>`:''}
+<div style="font-size:15px;line-height:21px;font-weight:800;color:${C};padding-top:4px;white-space:nowrap">${tdMoney(l.sum)}</div>
+</td>
+</tr></table></td></tr>`;
+  const totals=`<tr><td style="padding:16px 0 0;border-top:1px solid ${L}"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${F}">
+<tr><td style="font-size:14px;line-height:24px;color:${G}">Međuzbir</td><td align="right" style="font-size:14px;line-height:24px;font-weight:600;color:${C}">${tdMoney(o.subtotal)}</td></tr>
+<tr><td style="font-size:14px;line-height:24px;color:${G}">Dostava</td><td align="right" style="font-size:14px;line-height:24px;font-weight:600;color:${C}">${o.freeShip?'Besplatna':o.shipRange}</td></tr>
+<tr><td style="padding-top:10px;font-size:16px;line-height:24px;font-weight:800;color:${C}">Ukupno</td><td align="right" style="padding-top:10px;font-size:20px;line-height:26px;font-weight:800;color:${C}">${tdMoney(o.subtotal)}${o.freeShip?'':`<div style="font-size:12px;line-height:16px;font-weight:500;color:${G}">+ dostava ${o.shipRange}</div>`}</td></tr>
+</table></td></tr>`;
+  const wrap=(pre,rows)=>`<!doctype html><html lang="sr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>TopDrop</title></head><body style="margin:0;padding:0;background:#f4f3f0">
+<div style="display:none;max-height:0;overflow:hidden;opacity:0">${pre}</div>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f3f0"><tr><td align="center" style="padding:28px 12px">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;background:#ffffff;border-radius:14px">${rows}</table>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px"><tr><td align="center" style="padding:20px 12px;${F}font-size:12px;line-height:18px;color:#8a8882">© 2026 TopDrop · Srbija · <a href="${IG_URL}" style="color:#8a8882">@topdropstore</a></td></tr></table>
+</td></tr></table></body></html>`;
+  const addr=`${tdEsc(o.name)}<br>${tdEsc(o.street)}<br>${tdEsc(o.zip)} ${tdEsc(o.city)}<br>${tdEsc(o.tel)}`;
+  // --- kupac ---
+  const kupac=wrap(`Porudžbina #__BROJ__ je kod nas. Hvala, ${tdEsc(o.first)}!`,
+    head('header-kupac.png','Porudžbina primljena')+
+    `<tr><td style="padding:34px 32px 8px;${F}">
+<img src="${tdAbs('assets/mail/pill-poruceno.png')}" width="110" height="26" alt="✓ PORUČENO" style="display:block;border:0;width:110px;height:26px">
+<h1 style="margin:16px 0 8px;font-size:26px;line-height:32px;font-weight:800;letter-spacing:-.02em;color:${C}">Hvala, ${tdEsc(o.first)}! Porudžbina je kod nas.</h1>
+<p style="margin:0;font-size:15px;line-height:23px;color:#484742">Pakujemo ti patike i šaljemo kurirom. Plaćaš tek kad ti stignu na vrata.</p>
+</td></tr>
+<tr><td style="padding:18px 32px 6px"><table role="presentation" cellpadding="0" cellspacing="0" style="background:#f4f3f0;border-radius:10px"><tr><td style="padding:12px 16px;${F}font-size:13px;line-height:18px;color:${G}">Broj porudžbine&nbsp;&nbsp;<b style="font-size:16px;color:${C}">#__BROJ__</b></td></tr></table></td></tr>
+<tr><td style="padding:18px 32px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding-bottom:6px;${F}font-size:11px;line-height:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C}">Tvoja porudžbina</td></tr>
+${o.items.map(l=>item(l)).join('')}${totals}</table></td></tr>
+<tr><td style="padding:26px 32px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${F}"><tr>
+<td valign="top" width="50%" style="padding-right:12px"><div style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C};padding-bottom:6px">Šaljemo na</div><div style="font-size:14px;line-height:21px;color:#484742">${addr}</div></td>
+<td valign="top" width="50%"><div style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C};padding-bottom:6px">Plaćanje</div><div style="font-size:14px;line-height:21px;color:#484742">Pouzećem, kuriru pri preuzimanju</div></td>
+</tr></table></td></tr>
+<tr><td style="padding:26px 32px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f3f0;border-radius:10px;${F}"><tr><td style="padding:18px 20px">
+<div style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C};padding-bottom:8px">Šta sledi</div>
+<div style="font-size:14px;line-height:22px;color:#484742"><b style="color:${C}">1.</b> Pakujemo i šaljemo tvoju porudžbinu.<br><b style="color:${C}">2.</b> Kurir stiže za 1–5 radnih dana i zove te pre dostave.<br><b style="color:${C}">3.</b> Plaćaš kuriru kad preuzmeš paket.</div>
+<div style="font-size:13px;line-height:20px;color:${G};padding-top:8px">Ne odgovara broj? Menjamo u roku od 7 dana.</div>
+</td></tr></table></td></tr>
+<tr><td style="padding:26px 32px 34px;${F}font-size:14px;line-height:22px;color:#484742">Pitanja? Samo odgovori na ovaj mail ili nam piši na Instagramu <a href="${IG_URL}" style="color:${C};font-weight:700">@topdropstore</a>.<br><br>Vidimo se,<br><b style="color:${C}">TopDrop ekipa</b></td></tr>`);
+  // --- nama ---
+  const row=(k,v)=>`<tr><td style="padding:7px 0;border-top:1px solid ${L};font-size:13px;line-height:20px;color:${G};width:110px" width="110">${k}</td><td style="padding:7px 0;border-top:1px solid ${L};font-size:14px;line-height:20px;font-weight:600;color:${C}">${v}</td></tr>`;
+  const telHref=String(o.tel).replace(/[^0-9+]/g,'');
+  const nama=wrap(`Nova porudžbina #__BROJ__ · ${tdEsc(o.name)} · ${tdMoney(o.subtotal)}`,
+    head('header-nama.png','Nova porudžbina')+
+    `<tr><td style="padding:30px 32px 6px;${F}">
+<div style="font-size:13px;line-height:18px;color:${G}">Porudžbina</div>
+<div style="font-size:40px;line-height:44px;font-weight:800;letter-spacing:-.03em;color:${C}">#__BROJ__</div>
+<div style="font-size:14px;line-height:21px;color:${G};padding-top:4px">${tdEsc(o.date)} · ${o.count} kom · <b style="color:${C}">${tdMoney(o.subtotal)}</b>${o.freeShip?' · dostava besplatna':' + dostava'}</div>
+</td></tr>
+<tr><td style="padding:18px 32px 0"><table role="presentation" cellpadding="0" cellspacing="0"><tr>
+<td style="background:${Y};border-radius:999px"><a href="tel:${tdEsc(telHref)}" style="display:inline-block;padding:11px 18px;${F}font-size:14px;line-height:18px;font-weight:700;color:${C};text-decoration:none">Pozovi kupca</a></td>
+<td width="8" style="width:8px"></td>
+<td style="border:1px solid ${C};border-radius:999px"><a href="mailto:${tdEsc(o.email)}" style="display:inline-block;padding:10px 18px;${F}font-size:14px;line-height:18px;font-weight:700;color:${C};text-decoration:none">Piši kupcu</a></td>
+</tr></table></td></tr>
+<tr><td style="padding:24px 32px 0"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="${F}">
+<tr><td colspan="2" style="padding-bottom:6px;font-size:11px;line-height:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C}">Kupac</td></tr>
+${row('Ime',tdEsc(o.name))}${row('Telefon',`<a href="tel:${tdEsc(telHref)}" style="color:${C}">${tdEsc(o.tel)}</a>`)}${row('E-mail',`<a href="mailto:${tdEsc(o.email)}" style="color:${C}">${tdEsc(o.email)}</a>`)}${row('Ulica i broj',tdEsc(o.street))}${row('Grad',`${tdEsc(o.zip)} ${tdEsc(o.city)}`)}${row('Plaćanje','Pouzećem')}
+</table></td></tr>
+<tr><td style="padding:24px 32px 32px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding-bottom:6px;${F}font-size:11px;line-height:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C}">Šta je poručio</td></tr>
+${o.items.map(l=>item({...l,admin:true})).join('')}${totals}</table></td></tr>`);
+  return{kupac,nama};
+}
+
+const TRUST=[{value:'Sigurno',label:'Plaćaš tek kad ti kurir donese paket.',d:'M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z M9 12l2 2 4-4'},{value:'Pouzeće',label:'Bez kartica, bez uplata unapred.',d:'M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z M10 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M6 12h.01 M18 12h.01'},{value:'Srbija',label:'Stiže za 1–5 radnih dana, gde god da si.',d:'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2 M15 18H9 M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14 M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0'},{value:'DM',label:'Piši nam bilo šta, odgovaramo kao ljudi:',ig:IG,d:'M14.54 21.69a.5.5 0 0 0 .94-.03l6.5-19a.5.5 0 0 0-.64-.63l-19 6.5a.5.5 0 0 0-.02.93l7.93 3.18a2 2 0 0 1 1.11 1.11z M21.85 2.15L10.91 13.09'}];
+const FREE=17500; // free shipping for orders from 17.500 RSD (set by the owner)
+const SHIP_RANGE='350–600 RSD';
+const SHIP=[{label:'Srbija — dostava na adresu',eta:'U pravilu 1–5 radnih dana od slanja paketa · cena zavisi od težine'}];
+const PAY=[{label:'Plaćanje pouzećem',note:'Plaćaš pri preuzimanju na adresu'}];
+const FAQ=[
+['Kako mogu da poručim patike?','Porudžbinu možeš da napraviš preko webshopa ili putem Instagram DM-a (@topdropstore). Na isti način porudžbinu možeš i da otkažeš.'],
+['Kolika je cena dostave i koliko traje?','350–600 RSD, zavisno od težine paketa. Iznad 17.500 RSD dostava je besplatna. Šaljemo na teritoriji Srbije, a paket stiže za 1–5 radnih dana.'],
+['Koji načini plaćanja su dostupni?','Trenutno je moguće plaćanje pouzećem, prilikom dostave na tvoju adresu.'],
+['Kako da izaberem pravu veličinu?','Dostupne veličine su prikazane uz svaki model. Ako nisi siguran koju da izabereš, pošalji nam dužinu stopala u centimetrima u DM i rado ćemo ti pomoći.'],
+['Da li su patike odmah dostupne?','Dostupnost zavisi od modela i veličine. Pre poručivanja preporučujemo da nam pošalješ upit kako bismo potvrdili dostupnost.'],
+['Da li mogu da zamenim veličinu?','Zamena je moguća u zavisnosti od dostupnosti modela i veličine. Javi nam se u DM u roku od 7 dana od preuzimanja paketa. Patike moraju biti nekorišćene i u originalnom pakovanju, a trošak povratne i ponovne dostave snosi kupac.']];
+const POSTS=[
+{slug:'novi-drop-tisina-2026',topic:'Drop',date:'05.11.2026',title:'Novi drop: Tišina 2026',excerpt:'Mirni tonovi, teški materijali i krojevi koji ne traže pažnju.',paras:['TODO — uvod u kolekciju Tišina 2026. Ideja, inspiracija i zašto smo izabrali baš ove tonove.','TODO — ključni komadi kolekcije i kako ih kombinovati.','TODO — datum izlaska i broj komada u limitiranoj seriji.']},
+{slug:'vodic-za-velicine',topic:'Vodič',date:'20.10.2026',title:'Vodič za veličine: kako da pogodiš iz prve',excerpt:'Tri mere koje su ti potrebne i jedan trik sa omiljenom majicom.',paras:['TODO — kako se meri obim grudi, struka i dužina nogavice.','TODO — kako da uporediš sa majicom koju već imaš.','TODO — razlika između regular, relaxed i oversize kroja.']},
+{slug:'kako-odrzavati-odecu',topic:'Nega',date:'02.10.2026',title:'Kako održavati odeću da traje',excerpt:'Manje pranja, niže temperature i nikad sušilica za vunu.',paras:['TODO — pranje pamuka i teksasa.','TODO — nega vune i kože.','TODO — čuvanje odeće van sezone.']}];
+const LEGAL={
+shipping:['Dostava','Dostava',['Dostava je trenutno dostupna samo na području Srbije.','Cena dostave je 350–600 RSD i zavisi od težine. Za porudžbine iznad 17.500 RSD dostava je besplatna.','Dostava u pravilu traje 1–5 radnih dana od slanja paketa. Vreme dostave može da varira u zavisnosti od lokacije i kurirske službe.','Nakon slanja paketa dobićeš informacije o pošiljci i, ako je dostupno, broj za praćenje.','Dostava van Srbije trenutno nije dostupna. Za buduće mogućnosti dostave u druge države slobodno nam se javi.']],
+returns:['Zamena','Zamena',['Zamena veličine je moguća u zavisnosti od dostupnosti modela i veličine.','Za zamenu nam se javi u Instagram DM (@topdropstore) u roku od 7 dana od preuzimanja paketa.','Patike moraju biti nekorišćene i u originalnom pakovanju.','Trošak povratne i ponovne dostave snosi kupac.']],
+privacy:['Privatnost','Politika privatnosti',['TODO — pravni tekst. Ovaj dokument je placeholder i mora ga pregledati pravnik pre objave.','Za pitanja nam se javi putem Instagram DM-a (@topdropstore).']],
+terms:['Uslovi','Uslovi korišćenja',['Porudžbinu možeš da napraviš preko webshopa ili putem Instagram DM-a (@topdropstore).','Trenutno je moguće samo plaćanje pouzećem, pri preuzimanju na adresu.','Ako artikal nije na stanju, radi se po porudžbini. Pre poručivanja preporučujemo da nam pošalješ upit kako bismo potvrdili dostupnost.','Porudžbine se mogu otkazati putem stranice ili preko Instagram DM-a.','TODO — ostatak pravnog teksta mora pregledati pravnik pre objave.']]};
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.')+' RSD';
+const catLabel=id=>(CATS.find(c=>c.id===id)||{}).label||'';
+const DF={size:'',color:'',stock:false,mto:false,lim:false,sort:''};
+
+class Component extends DCLogic {
+  state=(()=>{let cart=[],r={};try{cart=SHOW_PRODUCTS?JSON.parse(localStorage.getItem('na-cart')||'[]'):[];r=JSON.parse(localStorage.getItem('na-route')||'{}');}catch(e){}
+    if(r.page==='blog'||r.page==='about'||(!SHOW_PRODUCTS&&r.page==='pdp')||(r.page==='text'&&!r.legal))r={...r,page:'home'};
+    return{page:'home',slug:null,cat:'',post:null,legal:null,...r,cart,w:typeof window!=='undefined'?window.innerWidth:1280,menu:false,f:{...DF,...(r.f||{})},color:null,size:null,img:0,sizeErr:false,toast:null,guide:false,ship:0,pay:0,orderId:null,faq:-1,sent:false,loading:false,filtersOpen:false};})();
+  componentDidMount(){try{this.preImgs=['assets/studio-pozadina.webp',...PRODUCTS.map(p=>p.cardImage)].map(src=>{const i=new Image();i.decoding='async';i.src=src;return i;});}catch(e){}this.pT=()=>{const el=document.getElementById('td-pthumb');if(!el)return;const de=document.scrollingElement||document.documentElement;const sh=de.scrollHeight,ch=window.innerHeight,st=de.scrollTop;if(sh<=ch+2){el.style.opacity=0;return;}const th=Math.max(40,ch*ch/sh);el.style.height=th+'px';el.style.transform='translateY('+(st/(sh-ch))*(ch-th)+'px)';el.style.opacity=1;};this.pTr=()=>{cancelAnimationFrame(this.pTf);this.pTf=requestAnimationFrame(this.pT);};window.addEventListener('scroll',this.pTr,{passive:true});window.addEventListener('resize',this.pTr);this.pTi=setInterval(this.pT,600);this.asM=()=>{const t=document.querySelector('.td-aside');if(t){const g=[t.scrollTop,t.scrollHeight,t.clientHeight];const o=this.state.asg||[];if(g.join()!==o.join())this.setState({asg:g});}};this.asI=setInterval(this.asM,500);this.onR=()=>this.setState({w:window.innerWidth,vh:window.innerHeight});this.onR();window.addEventListener('resize',this.onR);this.tdSync=setInterval(()=>this.syncHero(),400);this.syncHero();}
+  componentWillUnmount(){window.removeEventListener('scroll',this.pTr);window.removeEventListener('resize',this.pTr);clearInterval(this.pTi);clearInterval(this.asI);window.removeEventListener('resize',this.onR);clearTimeout(this.tt);clearTimeout(this.lt);clearInterval(this.tdSync);}
+  // Keeps the hero sneakers, bag and background on ONE clock: every td* CSS animation gets the same start time,
+  // so a sneaker and its background color can never drift apart (e.g. when elements mount at different moments).
+  syncHero(){try{if(!document.getAnimations)return;const as=document.getAnimations().filter(a=>/^td(Drop|Bg|Bag)$/.test(a.animationName||''));if(!as.length)return;
+    const live=as.filter(a=>a.startTime!=null);if(!live.length)return;
+    if(this.tdT0==null)this.tdT0=Math.min(...live.map(a=>a.startTime));
+    as.forEach(a=>{if(a.startTime==null||Math.abs(a.startTime-this.tdT0)>1)a.startTime=this.tdT0;});}catch(e){}}
+  componentDidUpdate(_,prev){if(prev.cart!==this.state.cart){try{localStorage.setItem('na-cart',JSON.stringify(this.state.cart));}catch(e){}}}
+  go(page,extra={}){
+    this.lockBody(false);const next={page,menu:false,filtersOpen:false,...extra};if(this.state&&this.state.page!==page)next.prev=this.state.page;
+    
+    this.setState(next,()=>{const s=this.state;try{localStorage.setItem('na-route',JSON.stringify({page:s.page,slug:s.slug,cat:s.cat,post:s.post,legal:s.legal,f:s.f}));}catch(e){}});
+    try{window.scrollTo(0,0);}catch(e){}
+  }
+  lockBody(on){try{document.documentElement.style.overscrollBehavior=on?'none':'';}catch(e){}}
+  setF(patch){this.setState(s=>({f:{...s.f,...patch}}));}
+  showToast(t){this.setState({toast:t});clearTimeout(this.tt);this.tt=setTimeout(()=>this.setState({toast:null}),2800);}
+  vm(p){
+    const h=(e)=>{e&&e.preventDefault&&e.preventDefault();this.go('pdp',{slug:p.slug,color:p.colors[0],size:null,img:0,sizeErr:false,qty:1});};
+    const off=p.compareAtPrice&&p.priceRSD?Math.round((1-p.priceRSD/p.compareAtPrice)*100):0;
+    const badge=p.madeToOrder?'Po porudžbini':p.isLimited?'Limited':off?`−${off}%`:'';
+    const dark=badge==='Limited'||badge.startsWith('−');
+    return{...p,open:h,cardImg:p.cardImage||'',noImg:!p.cardImage,priceFmt:p.priceRSD?fmt(p.priceRSD):'Cena uskoro',compareFmt:p.compareAtPrice?fmt(p.compareAtPrice):'',catLabel:catLabel(p.category),badge,badgeBg:dark?'#e9b52c':'#ffffff',badgeFg:'#16130f',dots:p.colors.map(c=>({label:COLORS[c][0],hex:COLORS[c][1]})),stockOn:p.inStock!==false?'true':'false',stockLabel:p.inStock!==false?'Na stanju':'Nema na stanju'};
+  }
+  renderVals(){
+    const s=this.state,m=s.w<768,pv=e=>e&&e.preventDefault&&e.preventDefault();
+    const g=(page,extra)=>e=>{pv(e);this.go(page,extra);};
+    const contentW=Math.min(s.w,1120)-48;
+    const t={display:Math.max(48,Math.floor(contentW/7.2/4)*4),h1:m?40:64,h2:m?32:40,h3:m?32:44,pad:m?24:64};
+    const nav={home:g('home'),shop:g('shop',{cat:'',f:{...DF}}),kids:g('shop',{cat:'',f:{...DF}}),limited:g('shop',{cat:'',f:{...DF,lim:PRODUCTS.some(p=>p.isLimited)}}),about:g('about'),faq:g('faq',{faq:-1}),contact:g('contact',{sent:false}),blog:g('blog'),cart:g('cart'),checkout:g('checkout'),allBrands:(e)=>{pv(e);if(m){this.go('shop',{cat:'',f:{...DF},filtersOpen:true});this.lockBody(true);}else this.go('shop',{cat:'',f:{...DF},brandsOpen:true});}};
+    const legal={};Object.keys(LEGAL).forEach(k=>legal[k]=g('text',{legal:k,post:null}));
+    const chip=(label,active,fn)=>({label,active,onClick:fn,bg:active?'#e9b52c':'transparent',fg:'#16130f'});
+    // shop
+    let items=PRODUCTS.filter(p=>(!s.cat||p.category===s.cat)&&(!s.f.size||p.sizes.includes(s.f.size))&&(!s.f.color||p.colors.includes(s.f.color))&&(!s.f.stock||p.inStock)&&(!s.f.mto||p.madeToOrder)&&(!s.f.lim||p.isLimited));
+    // Preporučeno: ovi brendovi idu prvi (redosled u nizu), pa sve ostalo.
+    const PRVI=['premiata'];
+    if(!s.f.sort){const r=p=>{const i=PRVI.indexOf(p.category);return i<0?PRVI.length:i;};items=[...items].sort((a,b)=>r(a)-r(b));}
+    if(s.f.sort==='asc')items=[...items].sort((a,b)=>(a.priceRSD||1e9)-(b.priceRSD||1e9));
+    if(s.f.sort==='desc')items=[...items].sort((a,b)=>(b.priceRSD||0)-(a.priceRSD||0));
+    if(!SHOW_PRODUCTS)items=[];
+    const sizeList=[...new Set(PRODUCTS.filter(p=>!s.cat||p.category===s.cat).flatMap(p=>p.sizes))].sort((a,b)=>parseFloat(a)-parseFloat(b));
+    const shop={
+      catLabel:catLabel(s.cat),title:s.f.lim&&!s.cat?'Limited':catLabel(s.cat)||'Shop',
+      countLabel:SHOW_PRODUCTS?`${items.length} ${items.length===1?'proizvod':'proizvoda'}`:'',soon:!SHOW_PRODUCTS,
+      loading:SHOW_PRODUCTS&&s.loading,showGrid:!s.loading&&items.length>0,empty:SHOW_PRODUCTS&&!s.loading&&items.length===0,items:items.map(p=>this.vm(p)),
+      catChips:[chip('Sve',!s.cat,()=>this.go('shop',{cat:''})),...CATS.map(c=>chip(c.label,s.cat===c.id,()=>this.go('shop',{cat:c.id,f:{...s.f,size:''}})))],
+      sizeChips:sizeList.map(z=>{const a=s.f.size===z;return{label:z,active:a,bg:a?'#16130f':'#f4f4f2',fg:a?'#ffffff':'#484742',sw:a?700:500,border:'transparent',onClick:()=>this.setF({size:a?'':z})};}),
+      colorChips:Object.keys(COLORS).filter(c=>PRODUCTS.some(p=>p.colors.includes(c))).map(c=>({label:COLORS[c][0],hex:COLORS[c][1],active:s.f.color===c,ring:s.f.color===c?'#16130f':'#cfcfca',onClick:()=>this.setF({color:s.f.color===c?'':c})})),
+      showTools:SHOW_PRODUCTS,sortOpen:!!s.sortOpen,sortRot:s.sortOpen?'rotate(180deg)':'none',toggleSort:()=>this.setState({sortOpen:!s.sortOpen}),closeSort:()=>this.setState({sortOpen:false}),sortLabel:({'':'Preporučeno',asc:'Najniža cena',desc:'Najviša cena'})[s.f.sort||''],sortOpts:[['','Preporučeno'],['asc','Najniža cena'],['desc','Najviša cena']].map(([k,l])=>{const a=(s.f.sort||'')===k;return{label:l,active:a,fg:a?'#16130f':'#63625c',w:a?600:400,dot:a?'#ffc400':'transparent',onClick:()=>{this.setF({sort:k});this.setState({sortOpen:false});}};}),
+      layout:SHOW_PRODUCTS&&!m?'220px minmax(0,1fr)':'minmax(0,1fr)',asidePos:m?'static':'sticky',asideMax:m?'none':(s.vh?(s.vh-120)+'px':'calc(100vh - 120px)'),...(()=>{const g=s.asg||[0,1,1];const [st,sh,ch]=g;const on=!m&&sh>ch+2;const th=on?Math.max(40,ch*ch/sh):0;return{thumbOn:on,thumbH:Math.round(th),thumbTop:on?Math.round(st+(st/(sh-ch))*(ch-th)):0,onAsideScroll:e=>{const t=e.currentTarget;this.setState({asg:[t.scrollTop,t.scrollHeight,t.clientHeight]});}};})(),filterBtn:s.filtersOpen?'Sakrij filtere':'Filteri',
+      anyFilter:!!(s.cat||s.f.size||s.f.stock||s.f.mto||s.f.lim),showLabel:'Prikaži patike',resetFg:(s.cat||s.f.size||s.f.stock||s.f.mto)?'#16130f':'#a3a19b',fCount:((s.cat?1:0)+(s.f.size?1:0)+((s.f.stock||s.f.mto)?1:0))||'',
+      ...(()=>{const L=[{id:'',label:'Sve'},...CATS].map(c=>{const n=PRODUCTS.filter(p=>!c.id||p.category===c.id).length;const a=(s.cat||'')===c.id;return{id:c.id,label:c.label,n:String(n),active:a,w:a?600:400,dot:a?'#ffc400':'transparent',fg:a?'#16130f':'#63625c',onClick:()=>this.go('shop',{cat:c.id,f:{...s.f,size:''}})};}).filter(b=>b.n!=='0'||b.active);const top=L.slice(0,5),rest=L.slice(5);const open=!!s.brandsOpen||rest.some(b=>b.active);return{brandAll:L,brandSheet:L.map(b=>({...b,onClick:()=>this.setState({cat:b.id,f:{...s.f,size:''}})})),brandTop:top,brandMore:rest,hasMore:rest.length>0,moreRows:open?'1fr':'0fr',moreOp:open?1:0,moreRot:open?'rotate(180deg)':'none',moreLabel:open?'Prikaži manje':`Prikaži još (${rest.length})`,toggleMore:()=>this.setState({brandsOpen:!open})};})(),
+      stockList:[['all','Sve'],['stock','Na stanju'],['mto','Po porudžbini']].map(([k,l])=>{const a=k==='all'?!s.f.stock&&!s.f.mto:!!s.f[k];const n=PRODUCTS.filter(p=>(!s.cat||p.category===s.cat)&&(k==='all'||(k==='stock'?p.inStock:p.madeToOrder))).length;return{label:l,n:String(n),active:a,w:a?600:400,dot:a?'#ffc400':'transparent',fg:a?'#16130f':'#63625c',onClick:()=>this.setF({stock:k==='stock',mto:k==='mto'})};}),
+      sortChips:[['','Preporučeno'],['asc','Cena ↑'],['desc','Cena ↓']].map(([k,l])=>chip(l,s.f.sort===k,()=>this.setF({sort:k})))};
+    // pdp
+    const P=PRODUCTS.find(p=>p.slug===s.slug)||PRODUCTS[0]||EMPTY_P;
+    const col=P.colors.includes(s.color)?s.color:P.colors[0];
+    const size=P.sizes.length===1?P.sizes[0]:s.size;
+    const v=this.vm(P);
+    const pd={...v,colorLabel:COLORS[col][0],inStock:!!P.priceRSD&&!P.madeToOrder,noPrice:!P.priceRSD,outOfStock:!!P.priceRSD&&P.madeToOrder,material:P.madeToOrder?'Po porudžbini':'Na stanju',sizeErr:s.sizeErr,
+      openCat:g('shop',{cat:P.category,f:{...DF}}),
+      mainImg:P.images[Math.min(s.img,P.images.length-1)]||'',mainIsCard:s.img===0,mainIsDetail:s.img>0,
+      thumbs:P.images.length>1?P.images.map((src,i)=>({src,label:'Slika '+(i+1),border:s.img===i?'#16130f':'transparent',onClick:()=>this.setState({img:i})})):[],
+      colorOpts:P.colors.map(c=>({label:COLORS[c][0],hex:COLORS[c][1],active:c===col,ring:c===col?'#16130f':'#cfcfca',onClick:()=>this.setState({color:c})})),
+      multiColor:P.colors.length>1,canQty:!!P.priceRSD,qty:String(s.qty||1),qtyMin:String((s.qty||1)<=1),qtyMax:String((s.qty||1)>=10),qtyDec:()=>this.setState({qty:Math.max(1,(s.qty||1)-1)}),qtyInc:()=>this.setState({qty:Math.min(10,(s.qty||1)+1)}),totalFmt:P.priceRSD?fmt(P.priceRSD*(s.qty||1)):'',imgBadge:v.badge&&!/^[−-]/.test(String(v.badge))?v.badge:'',offLabel:P.compareAtPrice&&P.priceRSD?'−'+Math.round((1-P.priceRSD/P.compareAtPrice)*100)+'%':'',sizeOpts:P.sizes.map(z=>{const a=z===size;return{label:z,active:a,bg:a?'#16130f':'#f4f3f0',fg:a?'#ffffff':'#16130f',w:a?700:500,border:'transparent',onClick:()=>this.setState({size:z,sizeErr:false})};}),
+      notes:[{k:'Dostupnost',v:P.madeToOrder?'Po porudžbini, pre poručivanja nam javi u DM da potvrdimo':'Na stanju, šaljemo odmah'},{k:'Dostava',v:'1–5 radnih dana, 350–600 RSD, preko 17.500 RSD besplatno'},{k:'Plaćanje',v:'Plaćaš kuriru na vratima'},{k:'Zamena',v:'Ne odgovara broj? Menjamo u roku od 7 dana'},{k:'Šifra',v:P.sku}],
+      add:()=>{if(!size){this.setState({sizeErr:true});return;}const key=`${P.slug}|${col}|${size}`;this.setState(st=>{const ex=st.cart.find(l=>l.key===key);const q=st.qty||1;return{cart:ex?st.cart.map(l=>l.key===key?{...l,qty:Math.min(10,l.qty+q)}:l):[...st.cart,{key,slug:P.slug,color:col,size,qty:q}]};});}};
+    const related=[...PRODUCTS.filter(p=>p.category===P.category&&p.slug!==P.slug),...PRODUCTS.filter(p=>p.category!==P.category&&p.featured)].slice(0,4).map(p=>this.vm(p));
+    // cart
+    const upd=(key,fn)=>this.setState(st=>({cart:st.cart.map(l=>l.key===key?{...l,qty:fn(l.qty)}:l).filter(l=>l.qty>0)}));
+    const lines=s.cart.map(l=>{const p=PRODUCTS.find(x=>x.slug===l.slug);if(!p)return null;return{...l,sku:p.sku,name:p.name,img:p.cardImage||'',brand:catLabel(p.category),colorName:COLORS[l.color]?COLORS[l.color][0]:'',meta:`${COLORS[l.color][0]} · ${l.size}`,totalFmt:fmt(p.priceRSD*l.qty),sum:p.priceRSD*l.qty,atMax:String(l.qty>=10),inc:()=>upd(l.key,q=>Math.min(10,q+1)),dec:()=>upd(l.key,q=>q-1),remove:()=>upd(l.key,()=>0),open:g('pdp',{slug:p.slug,color:l.color,size:l.size,img:0,qty:1})};}).filter(Boolean);
+    const subtotal=lines.reduce((a,l)=>a+l.sum,0);
+    const freeShip=subtotal>=FREE;
+    const shipLabel=freeShip?'Besplatno':SHIP_RANGE;
+    const textPage=s.legal?{eyebrow:LEGAL[s.legal][0],title:LEGAL[s.legal][1],back:nav.home,backLabel:'Početna',image:false,paras:LEGAL[s.legal][2].map(x=>({t:x}))}
+      :(()=>{const b=POSTS.find(x=>x.slug===s.post)||POSTS[0];return{eyebrow:`${b.date} · ${b.topic}`,title:b.title,back:nav.blog,backLabel:'Žurnal',image:true,paras:[{t:b.excerpt},...b.paras.map(x=>({t:x}))]};})();
+    const discAll=PRODUCTS.filter(p=>p.priceRSD&&p.compareAtPrice);
+    const disc=(discAll.some(p=>p.isLimited)?discAll.filter(p=>p.isLimited):discAll).map(p=>({p,off:Math.round((1-p.priceRSD/p.compareAtPrice)*100)}));
+    const maxOff=disc.reduce((a,d)=>Math.max(a,d.off),0);
+    const top=disc.filter(d=>d.off===maxOff);
+    const lim=top.find(d=>d.p.isLimited)||top[0];
+    return{
+      showAnnouncement:this.props.showAnnouncement??true,
+      gridCols:m?'repeat(2,minmax(0,1fr))':'repeat(3,minmax(0,1fr))',cardGrid:m?'repeat(2,minmax(0,1fr))':'repeat(auto-fill,minmax(240px,1fr))',cardGap:m?'12px':'20px',
+      t,nav,legal,isMobile:m,isDesktop:!m,menuOpen:m&&s.menu,menuIcon:s.menu?'✕':'☰',menuLabel:s.menu?'Zatvori meni':'Otvori meni',mTop:(s.mTop||64)+'px',toggleMenu:(e)=>{const h=e&&e.currentTarget&&e.currentTarget.closest?e.currentTarget.closest('header'):null;this.setState({menu:!s.menu,mTop:h?Math.max(0,Math.round(h.getBoundingClientRect().bottom)):64});},
+      heroH:m?760:640,
+      heroBagMb:m?236:24,
+      heroTrk:m?'115%':'170%',
+      heroBarPos:m?'bottom:32px':'top:42%;transform:translateY(-50%)',heroBarAlign:m?'flex-start':'center',heroTextW:m?340:260,heroLead:'Patike koje se nose, ne čuvaju u kutiji. Nađi svoj par, plati tek kad ti stigne na vrata.',
+      heroTitle:m?28:36,
+      blockMenu:e=>{e&&e.preventDefault&&e.preventDefault();},
+      footMidH:m?0:330,
+      cartCount:s.cart.reduce((a,l)=>a+l.qty,0),
+      isHome:s.page==='home',isShop:s.page==='shop',isPdp:s.page==='pdp',isCart:s.page==='cart',isCheckout:s.page==='checkout',isSuccess:s.page==='success',isAbout:s.page==='about',isContact:s.page==='contact',isFaq:s.page==='faq',isBlog:s.page==='blog',isText:s.page==='text',
+      catTiles:CATS.filter(c=>BRAND_LOGOS[c.id]).map(c=>({...c,logo:BRAND_LOGOS[c.id]?BRAND_LOGOS[c.id][0]:'',logoW:BRAND_LOGOS[c.id]?BRAND_LOGOS[c.id][1]:'',noLogo:!BRAND_LOGOS[c.id],ph:`logo ${c.label} · assets/brands/${c.id}.webp`,count:(n=>n?`${n} ${n===1?'proizvod':'proizvoda'}`:'')(PRODUCTS.filter(p=>p.category===c.id).length),open:g('shop',{cat:c.id,f:{...DF}})})),
+      newProducts:CATS.map(c=>PRODUCTS.find(p=>p.category===c.id&&p.featured)||PRODUCTS.find(p=>p.category===c.id)).filter(Boolean).slice(0,8).map(p=>this.vm(p)),
+      limitedPick:lim?{has:true,pre:top.length>1?'na':'na model',name:top.length>1?(lim.p.isLimited?'limited modele':'izabrane modele'):lim.p.name,off:lim.off,oldFmt:fmt(lim.p.compareAtPrice),newFmt:fmt(lim.p.priceRSD)}:{has:false,pre:'',name:'',off:0,oldFmt:'',newFmt:''},
+      barcode:[2,1,3,1,1,4,2,1,1,3,2,1,4,1,2,1,1,3,1,2,4,1,1,2,3,1,2,1,4,2,1,1,3].map(w=>({w})),
+      trust:TRUST,trustDots:TRUST.map((x,i)=>({label:x.value,on:(s.trI||0)===i,go:()=>{const el=document.querySelector('.td-trs');const it=el&&el.querySelectorAll('.td-tri')[i];if(el&&it)el.scrollTo({left:it.offsetLeft-el.offsetLeft-24,behavior:'smooth'});}})),onTrustScroll:(e)=>{const el=e.currentTarget;const it=el.querySelector('.td-tri');if(!it)return;const w=it.offsetWidth+12;let i=Math.round(el.scrollLeft/w);if(el.scrollLeft+el.clientWidth>=el.scrollWidth-4)i=TRUST.length-1;if(i!==(this.state.trI||0))this.setState({trI:i});},shop,filtersVisible:SHOW_PRODUCTS&&!m,mSheet:SHOW_PRODUCTS&&m&&!!s.filtersOpen,closeFilters:()=>{this.lockBody(false);this.setState({filtersOpen:false});try{localStorage.setItem('na-route',JSON.stringify({page:s.page,slug:s.slug,cat:s.cat,post:s.post,legal:s.legal,f:s.f}));}catch(e){}},sheetReset:()=>this.setState({cat:'',f:{...DF}}),showFilterBtn:SHOW_PRODUCTS&&m,hasProducts:SHOW_PRODUCTS,toggleFilters:()=>{this.lockBody(!s.filtersOpen);this.setState({filtersOpen:!s.filtersOpen});},
+      resetFilters:()=>this.go('shop',{cat:'',f:{...DF}}),skeletons:[1,2,3,4,5,6,7,8].map(k=>({k})),
+      pd,related,openGuide:()=>this.setState({guide:true}),closeGuide:()=>this.setState({guide:false}),stop:e=>e.stopPropagation(),guideOpen:s.guide,
+      guideRows:[],
+      lines,cartEmpty:lines.length===0,cartEmptyMobile:m&&lines.length===0,cartLayout:!m||lines.length>0,cartShipShown:lines.length?(freeShip?'Besplatno':SHIP_RANGE):'—',cartCountLabel:lines.length?`(${lines.reduce((n,l)=>n+l.qty,0)})`:'',cartCols:m?'1fr':'minmax(0,1fr) 360px',coCols:m?'1fr':'minmax(0,1fr) 440px',shipExtra:lines.length>0&&!freeShip,shipRangeLabel:SHIP_RANGE,cartLineCols:m?'96px minmax(0,1fr)':'132px minmax(0,1fr)',cartInfoCol:m?'1 / -1':'auto',cartQtyPad:m?'margin-left:104px':'',cartHas:lines.length>0,subtotalFmt:fmt(subtotal),shippingFmt:lines.length?shipLabel:'—',totalFmt:freeShip||!lines.length?fmt(subtotal):fmt(subtotal)+' + dostava',cartShipNote:freeShip?'Besplatno':SHIP_RANGE+' · zavisi od težine',
+      freeMsg:freeShip?'Dostava ide na nas':`Još ${fmt(FREE-subtotal)} i dostava je besplatna`,freePct:Math.min(100,Math.round(subtotal/FREE*100)),
+      shipOpts:SHIP.map((o,i)=>({...o,active:true,border:'#16130f',priceFmt:shipLabel,onClick:()=>{}})),
+      payOpts:PAY.map(o=>({...o,active:true,border:'#16130f',onClick:()=>{}})),
+      fe:(()=>{const er=s.ferr||{};const o={any:Object.keys(er).length>0,clear:e=>{const k=e.target.name;if(s.ferr&&s.ferr[k]){const n={...s.ferr};delete n[k];this.setState({ferr:n});}}};['name','tel','email','street','city','zip'].forEach(k=>{o[k]=er[k]||'';o[k+'On']=!!er[k];});const n=Object.keys(er).length;o.summary=n===1?'Fali još jedan podatak. Popuni označeno polje da pošaljemo porudžbinu.':`Fali još ${n} podataka. Popuni označena polja da pošaljemo porudžbinu.`;return o;})(),
+      submitOrder:e=>{pv(e);if(!lines.length){this.showToast('Korpa je prazna');return;}const f=e.currentTarget,v=k=>((f.elements[k]&&f.elements[k].value)||'').trim(),er={};if(v('name').length<3||!/\s/.test(v('name')))er.name='Upiši ime i prezime.';if(v('tel').replace(/[^0-9]/g,'').length<8)er.tel='Upiši broj telefona, kurir te zove pre dostave.';if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v('email')))er.email='Upiši ispravan e-mail, npr. ime@primer.rs.';if(v('street').length<3)er.street='Upiši ulicu i broj.';if(v('city').length<2)er.city='Upiši grad.';if(!/^[0-9]{5}$/.test(v('zip')))er.zip='Poštanski broj ima 5 cifara.';if(Object.keys(er).length){this.setState({ferr:er});const k=['name','tel','email','street','city','zip'].find(x=>er[x]);try{const el=f.elements[k];el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el.focus({preventScroll:true}),350);}catch(_){}return;}if(s.sending)return;this.setState({ferr:null,sendErr:false});
+        const localNo=()=>{let n=300;try{const x=parseInt(localStorage.getItem('td-order-no')||'',10);if(x>=300)n=x+1;localStorage.setItem('td-order-no',String(n));}catch(e){}return n;};
+        const done=no=>{this.setState({cart:[],sending:false});this.go('success',{orderId:'#'+no});};
+        if(!MAKE_WEBHOOK){done(localNo());return;}
+        const d=new Date(),p2=x=>String(x).padStart(2,'0');
+        const o={name:v('name'),first:v('name').split(/\s+/)[0],email:v('email'),tel:v('tel'),street:v('street'),city:v('city'),zip:v('zip'),date:`${p2(d.getDate())}.${p2(d.getMonth()+1)}.${d.getFullYear()}. ${p2(d.getHours())}:${p2(d.getMinutes())}`,
+          items:lines.map(l=>({img:tdAbs('assets/proizvodi/'+l.slug+'/mail.jpg'),brand:l.brand,name:l.name,sku:l.sku,size:l.size,color:l.colorName,qty:l.qty,sum:l.sum})),subtotal,freeShip,shipRange:SHIP_RANGE,count:lines.reduce((a,l)=>a+l.qty,0)};
+        const mails=tdBuildMails(o);
+        const body=new URLSearchParams({ime:o.name,email:o.email,telefon:o.tel,ulica:o.street,grad:o.city,postanski:o.zip,datum:o.date,ukupno:tdMoney(o.subtotal),dostava:o.freeShip?'Besplatna':SHIP_RANGE,komada:String(o.count),artikli:o.items.map(i=>`${i.sku} | ${i.name} | vel. ${i.size} | ${i.qty} kom | ${tdMoney(i.sum)}`).join('\n'),mailKupac:mails.kupac,mailNama:mails.nama});
+        this.setState({sending:true});
+        const ctl=typeof AbortController!=='undefined'?new AbortController():null;const tm=setTimeout(()=>{try{ctl&&ctl.abort();}catch(_){}},20000);
+        fetch(MAKE_WEBHOOK,{method:'POST',body,signal:ctl?ctl.signal:undefined}).then(r=>{if(!r.ok)throw new Error('http '+r.status);return r.text();}).then(t=>{clearTimeout(tm);let no=parseInt((String(t).match(/\d+/)||[])[0],10);if(!(no>=300))no=localNo();done(no);}).catch(()=>{clearTimeout(tm);this.setState({sending:false,sendErr:true});});
+      },
+      sending:!!s.sending,sendOp:s.sending?'.7':'1',sendErr:!!s.sendErr,poruciLabel:s.sending?'Šaljem porudžbinu…':'Poruči',
+      orderId:s.orderId,
+      contactDetails:[{k:'Dostava',v:'Srbija (1–3 radna dana)',d:'M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2 M15 18H9 M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.62l-3.48-4.35A1 1 0 0 0 17.52 8H14 M15 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M5 18a2 2 0 1 0 4 0a2 2 0 1 0-4 0'},{k:'Radno vreme za upite',v:'Svaki dan',d:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M12 7v5l3 2'},{k:'Odgovor',v:'Odgovaramo brzo',d:'M7.9 20A9 9 0 1 0 4 16.1L2 22z'}],contactFormTop:m?0:8,
+      mailOn:!!EMAIL,mailHref:'mailto:'+EMAIL,mailAddr:EMAIL,
+      goBack:e=>{pv(e);const b=s.prev&&s.prev!==s.page&&s.prev!=='success'?s.prev:'home';this.go(b);},
+      faqItems:FAQ.map(([q,a],i)=>({q,a,open:s.faq===i,closed:s.faq!==i,rows:s.faq===i?'1fr':'0fr',op:s.faq===i?1:0,ty:s.faq===i?'0':'-6px',rot:s.faq===i?'rotate(90deg)':'rotate(0deg)',toggle:()=>this.setState({faq:s.faq===i?-1:i})})),faqCols:m?'1fr':'minmax(0,5fr) minmax(0,7fr)',faqTitle:m?36:52,faqAnsPad:m?24:72,
+      posts:POSTS.map(b=>({...b,open:g('text',{post:b.slug,legal:null})})),
+      textPage,toast:s.toast};
+  }
+}
+</script>
+</body>
+</html>
